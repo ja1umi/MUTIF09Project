@@ -1,2 +1,3 @@
-# MUTIF09Project
-Various design materials for building my personal 6809-based single board computer
+# MUTIF09 Project
+
+Just for placeholder at this moment. Stay tuned!
