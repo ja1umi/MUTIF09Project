@@ -1,0 +1,56 @@
+Name     ADDRESSDECODE;
+PartNo   20V8;
+Date     7/3/2018;
+Revision 04;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g20v8a;
+
+/* *************** INPUT PINS *********************/
+PIN 1   =   A15;                /* system address a12 - A15     */
+PIN 2   =   A14;
+PIN 3   =   A13;
+PIN 4   =   A12;
+PIN 5   =   A7;                 /* system address a1 - A7       */
+PIN 6   =   A6;
+PIN 7   =   A5;
+PIN 8   =   A4;
+PIN 9   =   A3;
+PIN 10  =   A2;
+PIN 11  =   A1;
+/* PIN 13  =   Q;   */
+PIN 14  =   RW;
+PIN 23  =   E;
+
+FIELD ADDRESS = [A15..A12];                  
+
+/* *************** OUTPUT PINS *********************/
+PIN 15  =   RD;
+PIN 16  =   OE;
+/* PIN 17  =   DTRDY; */
+/* PIN 17  =   RAMCE; */
+PIN 17  = PITCE;
+PIN 18  =   PPICE;
+/* PIN 18  =   RTCCE; */
+PIN 19  =   ACIACE;
+PIN 20  =   APUCE;
+PIN 21  =   ROMCE;
+PIN 22  =   RAMWE;
+
+/* Intermediate Variable Definitions  */
+IOEQN   = ADDRESS:[BXXX .. BXXX];                               /* Memory-mapped I/O, $B000 .. $BFFF        */
+
+/* Logic Equations */
+RD      = !RW;
+/* DTRDY   = !E & !Q;                                              Data bus ready                           */
+/* RAMCE   = !(ADDRESS:[0XXX .. AXXX]);                            /* SRAM chip enable, $0000 .. $AFFF      */
+ROMCE   = !(ADDRESS:[CXXX .. FXXX]);                            /* PROM chip enable, ROM: $C000 .. $FFFF    */
+RAMWE   = !(!RW & E);                                           /* SRAM write enable                        */
+OE      = !(RW & E);                                            /* Output enable                            */
+/* RTCCE   = !(IOEQN & !A7 & !A6 &  A5 & !A4);                     Real Time Clock chip enable              */
+ACIACE  = !(IOEQN & !A7 & !A6 & !A5 & !A4 & !A3 & !A2 & !A1);   /* ACIA 6850 chip enable, $B000 .. $B001    */
+APUCE   = !(IOEQN & !A7 & !A6 & !A5 & !A4 & !A3 &  A2 & !A1);   /* APU Am9511 chip enable, $B004 .. $B005   */   
+PPICE   = !(IOEQN & !A7 & !A6 & !A5 &  A4 & !A3 & !A2);         /* PPI 8255A chip enable, $B010 .. $B013    */
+PITCE   = !(IOEQN & !A7 & !A6 & !A5 &  A4 & !A3 &  A2);         /* PIT 8254 chip enable, $B014 .. $B017     */

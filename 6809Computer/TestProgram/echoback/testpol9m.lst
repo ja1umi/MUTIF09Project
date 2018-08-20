@@ -1,0 +1,65 @@
+                      *       ECHOBACK TEST
+                      *       BY POLLING
+                      *
+                      *       ADDRESS
+B000                  ACIACS  EQU     $B000
+B001                  ACIADA  EQU     $B001
+7FFF                  STACK   EQU     $7FFF
+E000                          ORG     $E000
+                      *
+                      *       POWER ON SEQUENCE
+E000  10CE7FFF        START   LDS     #STACK
+                      *
+                      *       ACIA INITIALIZE
+E004  8603                    LDA     #$03
+E006  B7B000                  STA     ACIACS
+                      *       LDA     #$15
+E009  8695                    LDA     #$95
+E00B  B7B000                  STA     ACIACS
+                      *
+                      *       ECHOBACK TEST
+                      *       LDX     #MESG
+E00E  308C26                  LEAX MESG,PCR
+E011  8D1B                    BSR     PDATA
+E013  8D04            LOOP    BSR     INCH
+E015  8D0C                    BSR     OUTCH
+E017  20FA                    BRA     LOOP
+                      *
+                      *       INPUT CHAR
+E019  B6B000          INCH    LDA     ACIACS
+E01C  47                      ASRA
+E01D  24FA                    BCC     INCH
+E01F  B6B001                  LDA     ACIADA
+E022  39                      RTS
+                      *
+                      *       OUTPUT CHAR
+E023  F6B000          OUTCH   LDB     ACIACS
+E026  57                      ASRB
+E027  57                      ASRB
+E028  24F9                    BCC     OUTCH
+E02A  B7B001                  STA     ACIADA
+E02D  39                      RTS
+                      *
+                      *       OUTPUT STRING
+E02E  A680            PDATA   LDA     ,X+
+E030  2704                    BEQ     EXIT
+E032  8DEF                    BSR     OUTCH
+                      *       LEAX 1,X
+E034  20F8                    BRA     PDATA
+E036  39              EXIT    RTS
+                      *
+                      *       MESSAGE
+E037  0D0A            MESG    FCB     $0D,$0A
+E039  5B4D5554494630395D20363830392053696E676C6520426F61726420436F6D707574657220         FCC     "[MUTIF09] 6809 Single Board Computer "
+E05E  4563686F6261636B207465737420696E2070726F6772657373         FCC     "Echoback test in progress"
+E077  0D0A                    FCB     $0D,$0A
+E079  00                      FCB     $00
+                      *
+                      *       VECTOR
+E07A  3B              UUINT   RTI
+FFF8                          ORG     $FFF8
+FFF8  E07A                    FDB     UUINT
+FFFA  E07A                    FDB     UUINT
+FFFC  E07A                    FDB     UUINT
+FFFE  E000                    FDB     START
+                              END
