@@ -10,7 +10,7 @@ FAQ
 
 2. What does MUTIF mean?
 
-    MUTIF is an anagramm of my two amaterur radio call signs (suffix only).
+    MUTIF is an anagram of my two amaterur radio call signs (suffix only).
  
 
 
