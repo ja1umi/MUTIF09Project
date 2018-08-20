@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP R_Network_4Dev_5Pin
+D 5 Resistor network, star topology, bussed resistors, small symbol
+K R Network star-topology
+F http://www.vishay.com/docs/31509/csc.pdf
+$ENDCMP
+#
+#End Doc Library
