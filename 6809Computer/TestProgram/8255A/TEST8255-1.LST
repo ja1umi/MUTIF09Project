@@ -1,0 +1,39 @@
+                      * 8255 TEST PROGRAM (1) FOR MPB6809 MONITOR
+                      *
+F0E6                  PUTCH   EQU $F0E6
+F0C7                  GETCH   EQU $F0C7
+F0D8                  OUTHL   EQU $F0D8
+F0DC                  OUTHR   EQU $F0DC
+B010                  PPIPA   EQU $B010
+B011                  PPIPB   EQU $B011
+B012                  PPIPC   EQU $B012
+B013                  PPICS   EQU $B013
+                      *
+0100                          ORG $100
+0100  10CE7000                LDS #$7000
+0104  308C23          START   LEAX MSG,PCR
+0107  8680                    LDA #$80        ;initialization of 8255: all ports are
+0109  B7B013                  STA PPICS       ;set for output
+010C  8D12                    BSR PMSG
+010E  BDF0C7          LOOP    JSR GETCH
+0111  840F                    ANDA #$0F       ;write lower 4 bits of the 8-bit character code
+0113  B7B010                  STA PPIPA       ;to 8255 Port A correspond to the 4 LEDs
+0116  BDF0DC                  JSR OUTHR
+0119  8620                    LDA #$20
+011B  BDF0E6                  JSR PUTCH
+011E  20EE                    BRA LOOP
+                      *
+0120  A680            PMSG    LDA ,X+
+0122  2705                    BEQ QUIT1
+0124  BDF0E6                  JSR PUTCH
+0127  20F7                    BRA PMSG
+0129  39              QUIT1   RTS
+                      * 
+012A  0D0A            MSG     FCB $0D, $0A
+012C  383235354120544553542050524F4752414D2D31         FCC /8255A TEST PROGRAM-1/
+0140  0D0A                    FCB $0D, $0A
+0142  5055534820414E59204B4559         FCC /PUSH ANY KEY/
+014E  0D0A                    FCB $0D, $0A
+0150  00                      FCB 0
+                      *
+                              END
