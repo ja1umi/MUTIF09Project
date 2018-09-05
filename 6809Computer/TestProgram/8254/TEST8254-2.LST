@@ -1,0 +1,80 @@
+                      * 8254 TEST PROGRAM (2) FOR MPB6809 MONITOR
+                      *
+F0E6                  PUTCH   EQU $F0E6
+F0C7                  GETCH   EQU $F0C7
+B014                  CNT0    EQU $B014
+B015                  CNT1    EQU $B015
+B016                  CNT2    EQU $B016
+B017                  PITCW   EQU $B017
+                      *
+0100                          ORG $100
+0100  10CE7000                    LDS #$7000
+0104  308C38          START   LEAX MSG,PCR
+0107  8D2C                    BSR PMSG
+                      * Control Word Format
+                      *   D7  D6  D5  D4  D3  D2  D1  D0
+                      *   ===============================
+                      *   SC1 SC2 RW1 RW2 M2  M1  M0  BCD
+                      *   1   0   0   1   0   1   1   0   = $96
+                      *       SC: (10) Select Counter 2
+                      *       RW: (01) Read/Write LSB only
+                      *       M:  (011) Select Mode 3 Square Wave Mode
+                      *       BCD: 0 Binary counter
+                      *
+                      *   0   1   1   1   0   0   0   0   = $70
+                      *       SC: (01) Select Counter 1
+                      *       RW: (11) Read/Write LSB first and then MSB
+                      *       M:  (000) Select Mode 0 Interrut On Terminal Count
+                      *       BCD: 0 Binary counter
+                      *
+0109  8696                    LDA #$96        ;counter 2 (prescaler) initialization
+010B  B7B017                  STA PITCW       ;8,086,000/4 == 2,021,500 == 50 x 40,430
+010E  8628                    LDA #$28        ;use prescaler value of 50 (== $32)
+0110  B7B016                  STA CNT2
+0113  8670            LOOP    LDA #$70        ;counter 1 initialization
+                      *        STA PITCW       ;use initial counter value of 50,000 (== $C350)
+0115  B7B017                  STA PITCW       ;use initial counter value of 40,430 (== $9DEE)
+0118  86EE                    LDA #$EE        ;write LSB
+011A  B7B015                  STA CNT1
+011D  12                              NOP
+011E  869D                    LDA #$9D        ;write MSB
+0120  B7B015                  STA CNT1
+                      *
+                      * Read-Back Command Format
+                      *   D7  D6  D5  D4  D3  D2  D1  D0
+                      *   ===============================
+                      *   1   1   /CNT/ST C2  C1  C0  0
+                      *   1   1   1   0   0   1   0   0   = $E4
+                      *   Latch status info of counter 1 
+                      *
+                      *
+                      * Status Byte
+                      *   D7  D6  D5  D4  D3  D2  D1  D0
+                      *   ===============================
+                      *   OUT NUL RW1 RW0 M2  M1  M0  BCD
+                      *   OUT: Current state of the OUT pin 
+                      *        (goes 1 when the counter reaches 0)
+                      *
+0123  86E4                    LDA #$E4        ;read the status of Counter 1 by Read-Back Command
+0125  B7B017                  STA PITCW
+0128  B6B015                  LDA CNT1
+012B  48                      ASLA            ;Did Counter 1 reach terminal count (==2,000,000)?
+012C  24F5                    BCC *-9
+012E  862A                    LDA #'*'        ;if so, it means that one second has passed. Print asterisk
+0130  BDF0E6                  JSR PUTCH   
+0133  20DE                    BRA LOOP        ;repeat indefinitely
+                      *
+0135  A680            PMSG    LDA ,X+
+0137  2705                    BEQ QUIT1
+0139  BDF0E6                  JSR PUTCH
+013C  20F7                    BRA PMSG
+013E  39              QUIT1   RTS
+                      * 
+013F  0D0A            MSG     FCB $0D, $0A
+0141  3832353420544553542050524F4752414D2D32         FCC /8254 TEST PROGRAM-2/
+0154  0D0A                    FCB $0D, $0A
+0156  5052494E54204F4E4520415354415249534B20504552204F4E45205345434F4E44         FCC /PRINT ONE ASTARISK PER ONE SECOND/
+0177  0D0A                    FCB $0D, $0A
+0179  00                      FCB 0
+                      *
+                              END

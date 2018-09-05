@@ -1,0 +1,48 @@
+                      * 8254 TEST PROGRAM (1) FOR MPB6809 MONITOR
+                      *
+F0E6                  PUTCH   EQU $F0E6
+F0C7                  GETCH   EQU $F0C7
+F13E                  CONTRL  EQU $F13E
+B014                  CNT0    EQU $B014
+B015                  CNT1    EQU $B015
+B016                  CNT2    EQU $B016
+B017                  PITCW   EQU $B017
+                      *
+0100                          ORG $100
+0100  10CE7000                LDS #$7000
+0104  308C20          START   LEAX MSG, PCR
+0107  8D14                            BSR PMSG
+                      * Control Word Format
+                      *   D7  D6  D5  D4  D3  D2  D1  D0
+                      *   ===============================
+                      *   SC1 SC2 RW1 RW2 M2  M1  M0  BCD
+                      *   0   0   1   1   0   1   1   0   = $36
+                      *       SC: (00) Select Counter 0
+                      *       RW: (11) Write LSB first and then MSB
+                      *       M:  (011) Select Mode 3 Square Wave Mode
+                      *       BCD: 0 Binary counter
+                      *
+0109  8636                    LDA #$36                ;Counter 0 initialization
+010B  B7B017                  STA PITCW
+010E  86D0                    LDA #$D0                ;2000(10) == $7D0, 2 MHz / 2000 == 1 KHz
+0110  B7B014                  STA CNT0                ;write LSB
+0113  12                              NOP
+0114  8607                    LDA #$7
+0116  B7B014                  STA CNT0                ;write MSB
+0119  12                              NOP
+011A  7EF13E                          JMP CONTRL              ;return to monitor command line
+                      *
+011D  A680            PMSG    LDA ,X+
+011F  2705                    BEQ QUIT1
+0121  BDF0E6                  JSR PUTCH
+0124  20F7                    BRA PMSG
+0126  39              QUIT1   RTS
+                      * 
+0127  0D0A            MSG     FCB $0D, $0A
+0129  3832353420544553542050524F4752414D2D31         FCC /8254 TEST PROGRAM-1/
+013C  0D0A                    FCB $0D, $0A
+013E  53515541524520574156452047454E45524154494F4E204154204652455155454E4359204F462031204B487A         FCC /SQUARE WAVE GENERATION AT FREQUENCY OF 1 KHz/
+016A  0D0A                    FCB $0D, $0A
+016C  00                      FCB 0
+                      *
+                              END
