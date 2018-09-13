@@ -40,8 +40,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "MUTIF09 6809 Single Board Computer"
-Date "2018-07-01"
-Rev "1"
+Date "2018-09-10"
+Rev "2"
 Comp "MUTIF09 Project"
 Comment1 ""
 Comment2 ""
@@ -117,7 +117,6 @@ F 3 "" H 6800 1400 60  0001 C CNN
 	1    6800 1850
 	1    0    0    -1  
 $EndComp
-NoConn ~ 6200 1800
 NoConn ~ 6200 1900
 $Comp
 L C C4
@@ -196,17 +195,6 @@ F 3 "" H 10450 2900 50  0001 C CNN
 	1    10450 2900
 	1    0    0    -1  
 $EndComp
-$Comp
-L MAX662A U12
-U 1 1 5B2A6291
-P 10300 5750
-F 0 "U12" H 10100 6100 60  0000 C CNN
-F 1 "MAX662A" H 10300 5400 60  0000 C CNN
-F 2 "Housings_DIP:DIP-8_W7.62mm_Socket" H 10300 5300 60  0001 C CNN
-F 3 "" H 10300 5300 60  0001 C CNN
-	1    10300 5750
-	1    0    0    -1  
-$EndComp
 Text Notes 10025 1850 0    60   ~ 0
 MPU Expansion connector
 $Comp
@@ -258,11 +246,11 @@ Text Label 1650 800  2    50   ~ 0
 NoConn ~ 8850 5650
 NoConn ~ 8850 5850
 NoConn ~ 8850 6050
-Text Label 10150 5100 0    60   ~ 0
+Text Label 10650 5800 0    60   ~ 0
 GND
 Text Label 10950 5900 0    60   ~ 0
 +5V
-Text Label 10900 4850 0    60   ~ 0
+Text Label 10850 5700 0    60   ~ 0
 +12V
 $Comp
 L PWR_FLAG #FLG01
@@ -920,7 +908,6 @@ Text Label 650  5300 0    60   ~ 0
 GND
 Text Label 10750 2700 0    60   ~ 0
 /HALT
-NoConn ~ 2650 4700
 Text Notes 1400 3650 0    40   ~ 0
 Use decimal 16 for the baud rate divisor to\nsend/receive data at a rate of 115200bps
 Text Label 10750 2800 0    60   ~ 0
@@ -1116,8 +1103,6 @@ Text Notes 5600 3800 0    60   ~ 0
 Programmable Interval Timer
 Text Notes 3850 3900 0    60   ~ 0
 Programmable Peripheral\nInterface
-NoConn ~ 6200 1600
-NoConn ~ 6200 1700
 $Comp
 L R R9
 U 1 1 5B2DC0AA
@@ -1135,21 +1120,8 @@ Text Label 7650 1300 0    60   ~ 0
 /END
 Text Label 10750 3300 0    60   ~ 0
 /END
-$Comp
-L Jumper_NC_Small JP2
-U 1 1 5B2EC48C
-P 7950 2100
-F 0 "JP2" H 7950 2180 50  0000 C CNN
-F 1 "Normally installed" H 7960 2040 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 7950 2100 50  0001 C CNN
-F 3 "" H 7950 2100 50  0001 C CNN
-	1    7950 2100
-	0    -1   -1   0   
-$EndComp
-Text Label 7950 2500 3    60   ~ 0
-/HALT
 Text Notes 6200 1000 0    60   ~ 0
-Arithmetic Processing Unit
+         Socket for\nArithmetic Processing Unit
 NoConn ~ 8050 5950
 Text Notes 4150 1000 0    60   ~ 0
 PLD\nAddress decoder logic
@@ -1220,17 +1192,6 @@ Text Label 6450 6650 2    60   ~ 0
 OUT1
 Text Label 6450 6350 2    60   ~ 0
 OUT0
-$Comp
-L Conn_01x01 J10
-U 1 1 5B30BF3F
-P 7125 6350
-F 0 "J10" H 7125 6450 50  0000 C CNN
-F 1 "TP3" H 7125 6250 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x01_Pitch2.54mm" H 7125 6350 50  0001 C CNN
-F 3 "" H 7125 6350 50  0001 C CNN
-	1    7125 6350
-	1    0    0    -1  
-$EndComp
 Text Label 9550 4450 0    60   ~ 0
 A15
 NoConn ~ 8050 5750
@@ -1256,8 +1217,6 @@ Text Notes 4400 7700 0    60   ~ 0
 Port B
 Text Notes 5400 7700 0    60   ~ 0
 Port C
-Text Notes 5600 3000 0    40   ~ 0
-The Jumper above is normally installed to allow the MPU \n(MC6809) to stop running until completion of the execution \nof the current APU command.\nLeave the jumper installed unless you are going to use an \ninterrupt-driven processing. 
 $Comp
 L 74HCU04 U13
 U 1 1 5B2FA490
@@ -1344,8 +1303,6 @@ Text Label 7675 6350 2    60   ~ 0
 GND
 Text Label 7675 6250 2    50   ~ 0
 AUDIO_OUT
-Text Label 6925 6350 2    60   ~ 0
-E
 $Comp
 L C_Small C10
 U 1 1 5B30EE55
@@ -1360,44 +1317,11 @@ $EndComp
 Text Label 2650 4300 0    60   ~ 0
 GND
 $Comp
-L C_Small C12
-U 1 1 5B315BD3
-P 9700 5600
-F 0 "C12" H 9800 5550 50  0000 L CNN
-F 1 "0.22u" H 9750 5650 50  0000 L CNN
-F 2 "Capacitors_THT:C_Disc_D5.0mm_W2.5mm_P5.00mm" H 9700 5600 50  0001 C CNN
-F 3 "" H 9700 5600 50  0001 C CNN
-	1    9700 5600
-	-1   0    0    1   
-$EndComp
-$Comp
-L C_Small C13
-U 1 1 5B315C78
-P 9700 5850
-F 0 "C13" H 9500 5900 50  0000 L CNN
-F 1 "0.22u" H 9450 5800 50  0000 L CNN
-F 2 "Capacitors_THT:C_Disc_D5.0mm_W2.5mm_P5.00mm" H 9700 5850 50  0001 C CNN
-F 3 "" H 9700 5850 50  0001 C CNN
-	1    9700 5850
-	1    0    0    -1  
-$EndComp
-$Comp
-L CP1_Small C15
-U 1 1 5B317098
-P 10550 5100
-F 0 "C15" H 10560 5170 50  0000 L CNN
-F 1 "4.7u" H 10560 5020 50  0000 L CNN
-F 2 "Capacitors_THT:CP_Radial_D5.0mm_P2.50mm" H 10550 5100 50  0001 C CNN
-F 3 "" H 10550 5100 50  0001 C CNN
-	1    10550 5100
-	0    1    1    0   
-$EndComp
-$Comp
 L CP1_Small C16
 U 1 1 5B3174A7
 P 10900 6100
 F 0 "C16" H 10910 6170 50  0000 L CNN
-F 1 "4.7u" H 10910 6020 50  0000 L CNN
+F 1 "47u" H 10910 6020 50  0000 L CNN
 F 2 "Capacitors_THT:CP_Radial_D5.0mm_P2.50mm" H 10900 6100 50  0001 C CNN
 F 3 "" H 10900 6100 50  0001 C CNN
 	1    10900 6100
@@ -1407,6 +1331,51 @@ Text Label 10900 6350 0    60   ~ 0
 GND
 Text Label 1300 1300 0    60   ~ 0
 GND
+Text Label 1450 4600 2    60   ~ 0
+BS
+Text Label 1450 4700 2    60   ~ 0
+BA
+Text Label 3400 3600 0    60   ~ 0
+MRDY
+Text Label 7400 2000 0    60   ~ 0
+MRDY
+Text Label 10750 3100 0    60   ~ 0
+Q
+Text Label 2650 4700 0    60   ~ 0
+Q
+$Comp
+L C_Small C13
+U 1 1 5B96DFFE
+P 3050 3050
+F 0 "C13" H 3060 3120 50  0000 L CNN
+F 1 "0.1u" H 3060 2970 50  0000 L CNN
+F 2 "Capacitors_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm" H 3050 3050 50  0001 C CNN
+F 3 "" H 3050 3050 50  0001 C CNN
+	1    3050 3050
+	1    0    0    -1  
+$EndComp
+$Comp
+L C_Small C12
+U 1 1 5B96EE63
+P 2850 6800
+F 0 "C12" H 2860 6870 50  0000 L CNN
+F 1 "0.1u" H 2860 6720 50  0000 L CNN
+F 2 "Capacitors_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm" H 2850 6800 50  0001 C CNN
+F 3 "" H 2850 6800 50  0001 C CNN
+	1    2850 6800
+	1    0    0    -1  
+$EndComp
+$Comp
+L U3V12F12 U12
+U 1 1 5B973F86
+P 10300 5800
+F 0 "U12" H 10250 6100 60  0000 C CNN
+F 1 "U3V12F12" H 10250 5500 60  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm" H 10300 5800 60  0001 C CNN
+F 3 "" H 10300 5800 60  0001 C CNN
+	1    10300 5800
+	1    0    0    -1  
+$EndComp
 Wire Wire Line
 	2700 1300 3400 1300
 Wire Wire Line
@@ -1431,8 +1400,6 @@ Wire Wire Line
 Wire Wire Line
 	6200 1300 6050 1300
 Wire Wire Line
-	6050 850  6050 1500
-Wire Wire Line
 	6050 850  5850 850 
 Connection ~ 5850 850 
 Wire Wire Line
@@ -1453,34 +1420,6 @@ Wire Wire Line
 Wire Wire Line
 	7550 2550 7650 2550
 Connection ~ 7650 2550
-Wire Wire Line
-	10800 5900 10950 5900
-Wire Wire Line
-	10900 6000 10900 5900
-Connection ~ 10900 5900
-Wire Wire Line
-	10150 5100 10450 5100
-Wire Wire Line
-	10300 5100 10300 5400
-Wire Wire Line
-	10300 5400 10950 5400
-Wire Wire Line
-	10950 5400 10950 5700
-Wire Wire Line
-	10950 5600 10800 5600
-Connection ~ 10300 5100
-Wire Wire Line
-	10950 5700 10800 5700
-Connection ~ 10950 5600
-Wire Wire Line
-	11100 5800 10800 5800
-Wire Wire Line
-	11100 4850 11100 5800
-Wire Wire Line
-	11100 4850 10900 4850
-Wire Wire Line
-	10650 5100 11100 5100
-Connection ~ 11100 5100
 Wire Wire Line
 	1100 800  1650 800 
 Wire Wire Line
@@ -1577,7 +1516,7 @@ Wire Wire Line
 	3150 4100 3150 5150
 Connection ~ 3150 4500
 Wire Wire Line
-	2650 4600 3000 4600
+	2650 4600 3400 4600
 Wire Wire Line
 	3000 4600 3000 4100
 Wire Wire Line
@@ -1619,11 +1558,6 @@ Wire Wire Line
 	11050 2950 11050 3150
 Wire Wire Line
 	10750 3000 11050 3000
-Wire Wire Line
-	10750 3100 10850 3100
-Wire Wire Line
-	10850 3100 10850 3000
-Connection ~ 10850 3000
 Connection ~ 11050 3000
 Wire Wire Line
 	10900 1950 10900 2000
@@ -1642,19 +1576,12 @@ Wire Wire Line
 Wire Wire Line
 	7200 5100 6900 5100
 Wire Wire Line
-	6050 1500 6200 1500
-Connection ~ 6050 1300
-Wire Wire Line
 	7500 750  7500 900 
 Wire Wire Line
 	7400 1300 7650 1300
 Wire Wire Line
 	7500 1200 7500 1300
 Connection ~ 7500 1300
-Wire Wire Line
-	7950 2200 7950 2500
-Wire Wire Line
-	7400 2000 7950 2000
 Connection ~ 700  2000
 Wire Wire Line
 	1050 1900 1500 1900
@@ -1723,25 +1650,11 @@ Wire Wire Line
 	5300 5100 5700 5100
 Connection ~ 5300 5100
 Wire Wire Line
-	9700 5500 9800 5500
-Wire Wire Line
-	9800 5500 9800 5600
-Wire Wire Line
-	9700 5700 9800 5700
-Wire Wire Line
-	9700 5750 9800 5750
-Wire Wire Line
-	9800 5750 9800 5800
-Wire Wire Line
-	9700 5950 9800 5950
-Wire Wire Line
-	9800 5950 9800 5900
-Wire Wire Line
 	10900 6200 10900 6350
 Wire Wire Line
 	1300 1300 1500 1300
 Wire Wire Line
-	1400 3250 1400 2800
+	1400 2800 1400 3400
 Wire Wire Line
 	1400 2500 1400 2400
 Wire Wire Line
@@ -1758,10 +1671,6 @@ Wire Wire Line
 Connection ~ 1400 3250
 Wire Wire Line
 	1500 1400 1300 1400
-Text Label 1450 4600 2    60   ~ 0
-BS
-Text Label 1450 4700 2    60   ~ 0
-BA
 Wire Wire Line
 	650  5200 650  5300
 Wire Wire Line
@@ -1779,4 +1688,59 @@ Wire Wire Line
 Wire Wire Line
 	6900 4200 7350 4200
 Connection ~ 7350 4200
+Connection ~ 3000 4600
+Wire Wire Line
+	3400 4600 3400 3600
+Wire Wire Line
+	3050 2950 2600 2950
+Wire Wire Line
+	3050 3150 3050 3400
+Wire Wire Line
+	2850 6700 2500 6700
+Wire Wire Line
+	2850 6900 2850 7150
+Wire Wire Line
+	1500 7000 1500 7150
+Wire Wire Line
+	1500 7150 2850 7150
+Wire Wire Line
+	3050 3400 1400 3400
+Wire Wire Line
+	10650 5700 11100 5700
+Wire Wire Line
+	10650 5900 10950 5900
+Wire Wire Line
+	10900 6000 10900 5900
+Connection ~ 10900 5900
+Wire Wire Line
+	5900 1600 6200 1600
+Wire Wire Line
+	6000 1700 6200 1700
+Wire Wire Line
+	6050 1300 6050 850 
+Wire Wire Line
+	6200 1500 5700 1500
+Wire Wire Line
+	5700 1500 5700 2750
+Wire Wire Line
+	5900 2750 5900 1600
+Wire Wire Line
+	6000 2750 6000 1700
+Text Label 5800 2750 1    60   ~ 0
+GND
+Text Notes 5400 3350 0    40   ~ 0
+Make sure that pin 3 and pin 4 are \nconnected together unless justified
+Text Label 6200 1800 2    60   ~ 0
+Q
+$Comp
+L Conn_01x04 J10
+U 1 1 5B99B0DD
+P 5900 2950
+F 0 "J10" V 6050 2900 50  0000 C CNN
+F 1 "Conn_01x04" H 5900 2650 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm" H 5900 2950 50  0001 C CNN
+F 3 "" H 5900 2950 50  0001 C CNN
+	1    5900 2950
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC
