@@ -1,0 +1,41 @@
+                      * 8255 TEST PROGRAM (3) FOR MPB6809 MONITOR
+                      *
+F0E6                  PUTCH   EQU $F0E6
+F0C7                  GETCH   EQU $F0C7
+F0D8                  OUTHL   EQU $F0D8
+F0DC                  OUTHR   EQU $F0DC
+B010                  PPIPA   EQU $B010
+B011                  PPIPB   EQU $B011
+B012                  PPIPC   EQU $B012
+B013                  PPICS   EQU $B013
+                      *
+0100                          ORG $100
+0100  10CE7000                LDS #$7000
+0104  308C26          START   LEAX MSG,PCR
+0107  8680                    LDA #$80                ;condifure Port A, B and C for output
+0109  B7B013                  STA PPICS
+010C  8D15                    BSR PMSG
+010E  BDF0C7          LOOP    JSR GETCH
+0111  8501                            BITA #1
+0113  2707                            BEQ L1
+0115  8603                            LDA #$03
+0117  B7B013                          STA PPICS
+011A  2005                            BRA L2
+011C  8602            L1              LDA #$02
+011E  B7B013                          STA PPICS
+0121  20EB            L2              BRA LOOP
+                      *
+0123  A680            PMSG    LDA ,X+
+0125  2705                    BEQ QUIT1
+0127  17EFBC                  LBSR PUTCH
+012A  20F7                    BRA PMSG
+012C  39              QUIT1   RTS
+                      * 
+012D  0D0A            MSG     FCB $0D, $0A
+012F  383235354120            FCC /8255A /
+0135  54455354                FCC /TEST/
+0139  2D33                    FCC /-3/
+013B  0D0A                    FCB $0D, $0A
+013D  00                      FCB 0
+                      *
+                              END
