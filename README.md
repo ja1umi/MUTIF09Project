@@ -16,5 +16,5 @@ FAQ
 
     Refer to the schematic(s), order the PCB(s), collect parts required, populate the parts on the PCB just as you did in your other DIY electronics project. Knowledge of basic soldering techniques is also required. Remember to get your PC ready with USB-TTL serial cable installed because MUTIF09 single board computer has a serial console only.
 
-    Like other open source projects, documents, sample programs and ohter design materials contained in this repository is provided "as is" without warranty.
+    Like other open source projects, documents, sample programs and ohter design materials contained in this repository are provided "as is" without warranty.
 
