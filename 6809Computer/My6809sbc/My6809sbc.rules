@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 18252)
+    (start_pass_no 14169)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -76,12 +76,12 @@
     /OUT0 /OUT1 /E /D0 /D1 //NMI /D2 //IRQ
     /D3 //FIRQ /D4 /D5 "/R_/W" /D6 //RESET /D7
     //HALT /A0 /BS /A1 /BA /A2 /A3 /A4
-    "//R_W" /A5 //END /A6 /A7 /A8 /A15 /A9
-    /A14 /A10 /A13 /A11 /A12 "//BUFFER_FULL" "Net-(R8-Pad2)" "Net-(R10-Pad1)"
-    "Net-(U1-Pad1)" /EXTAL /SCLK "Net-(U3-Pad5)" //ACIA1CE "Net-(U4-Pad1)" //PPICE "Net-(U6-Pad13)"
-    //OE //PITCE //APUCE //ROMCE //RAMWE "Net-(U7-Pad15)" "Net-(U8-Pad7)" "Net-(U9-Pad8)"
-    "Net-(U9-Pad10)" "Net-(U9-Pad4)" "Net-(U9-Pad12)" "Net-(U9-Pad6)" "Net-(J2-Pad6)" /Q /MRDY "Net-(J10-Pad2)"
-    "Net-(J10-Pad1)" "Net-(J10-Pad4)"
+    "//R_W" /A5 /A6 /A7 /A8 /A15 /A9 /A14
+    /A10 /A13 /A11 /A12 "//BUFFER_FULL" "Net-(R8-Pad2)" "Net-(R10-Pad1)" "Net-(U1-Pad1)"
+    /EXTAL /SCLK "Net-(U3-Pad5)" //ACIA1CE "Net-(U4-Pad1)" //PPICE "Net-(U6-Pad13)" //OE
+    //PITCE //APUCE //ROMCE //RAMWE "Net-(U7-Pad15)" "Net-(U8-Pad7)" "Net-(U9-Pad8)" "Net-(U9-Pad10)"
+    "Net-(U9-Pad4)" "Net-(U9-Pad12)" "Net-(U9-Pad6)" "Net-(J2-Pad6)" /Q /MRDY "Net-(J12-Pad28)" "Net-(U8-Pad3)"
+    "Net-(U8-Pad4)" "Net-(U8-Pad5)" "Net-(U8-Pad17)" "Net-(U8-Pad24)"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule

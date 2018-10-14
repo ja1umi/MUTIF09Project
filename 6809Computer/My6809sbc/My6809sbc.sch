@@ -40,8 +40,8 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "MUTIF09 6809 Single Board Computer"
-Date "2018-09-10"
-Rev "2"
+Date "2018-10-12"
+Rev "3"
 Comp "MUTIF09 Project"
 Comment1 ""
 Comment2 ""
@@ -111,7 +111,7 @@ L Am9511 U8
 U 1 1 5B28E8C9
 P 6800 1850
 F 0 "U8" H 6500 2600 60  0000 C CNN
-F 1 "Am9511" H 6800 1100 60  0000 C CNN
+F 1 "HEADER 2x12" H 6800 1100 60  0000 C CNN
 F 2 "Housings_DIP:DIP-24_W15.24mm_Socket" H 6800 1400 60  0001 C CNN
 F 3 "" H 6800 1400 60  0001 C CNN
 	1    6800 1850
@@ -482,8 +482,6 @@ Text Label 6200 2400 2    60   ~ 0
 D4
 Text Label 7400 1400 0    60   ~ 0
 E
-Text Label 7400 1500 0    60   ~ 0
-GND
 Text Label 7400 1600 0    60   ~ 0
 A0
 Text Label 7400 1700 0    60   ~ 0
@@ -814,7 +812,7 @@ L R R1
 U 1 1 5B2E18A0
 P 650 4100
 F 0 "R1" V 730 4100 50  0000 C CNN
-F 1 "2.2k" V 650 4100 50  0000 C CNN
+F 1 "10k" V 650 4100 50  0000 C CNN
 F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 580 4100 50  0001 C CNN
 F 3 "" H 650 4100 50  0001 C CNN
 	1    650  4100
@@ -825,7 +823,7 @@ L R R2
 U 1 1 5B2E197C
 P 800 4100
 F 0 "R2" V 880 4100 50  0000 C CNN
-F 1 "2.2k" V 800 4100 50  0000 C CNN
+F 1 "10k" V 800 4100 50  0000 C CNN
 F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 730 4100 50  0001 C CNN
 F 3 "" H 800 4100 50  0001 C CNN
 	1    800  4100
@@ -836,7 +834,7 @@ L R R4
 U 1 1 5B2E19FF
 P 950 4100
 F 0 "R4" V 1030 4100 50  0000 C CNN
-F 1 "2.2k" V 950 4100 50  0000 C CNN
+F 1 "10k" V 950 4100 50  0000 C CNN
 F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 880 4100 50  0001 C CNN
 F 3 "" H 950 4100 50  0001 C CNN
 	1    950  4100
@@ -847,7 +845,7 @@ L R R5
 U 1 1 5B2E1A7E
 P 2700 3950
 F 0 "R5" V 2780 3950 50  0000 C CNN
-F 1 "2.2k" V 2700 3950 50  0000 C CNN
+F 1 "10k" V 2700 3950 50  0000 C CNN
 F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 2630 3950 50  0001 C CNN
 F 3 "" H 2700 3950 50  0001 C CNN
 	1    2700 3950
@@ -858,7 +856,7 @@ L R R6
 U 1 1 5B2E1B51
 P 3000 3950
 F 0 "R6" V 3080 3950 50  0000 C CNN
-F 1 "2.2k" V 3000 3950 50  0000 C CNN
+F 1 "10k" V 3000 3950 50  0000 C CNN
 F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 2930 3950 50  0001 C CNN
 F 3 "" H 3000 3950 50  0001 C CNN
 	1    3000 3950
@@ -869,7 +867,7 @@ L R R7
 U 1 1 5B2E1BC0
 P 3150 3950
 F 0 "R7" V 3230 3950 50  0000 C CNN
-F 1 "2.2k" V 3150 3950 50  0000 C CNN
+F 1 "10k" V 3150 3950 50  0000 C CNN
 F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 3080 3950 50  0001 C CNN
 F 3 "" H 3150 3950 50  0001 C CNN
 	1    3150 3950
@@ -880,7 +878,7 @@ L R R8
 U 1 1 5B2E1C43
 P 3300 3950
 F 0 "R8" V 3380 3950 50  0000 C CNN
-F 1 "2.2k" V 3300 3950 50  0000 C CNN
+F 1 "10k" V 3300 3950 50  0000 C CNN
 F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 3230 3950 50  0001 C CNN
 F 3 "" H 3300 3950 50  0001 C CNN
 	1    3300 3950
@@ -1103,25 +1101,8 @@ Text Notes 5600 3800 0    60   ~ 0
 Programmable Interval Timer
 Text Notes 3850 3900 0    60   ~ 0
 Programmable Peripheral\nInterface
-$Comp
-L R R9
-U 1 1 5B2DC0AA
-P 7500 1050
-F 0 "R9" V 7580 1050 50  0000 C CNN
-F 1 "2.2k" V 7500 1050 50  0000 C CNN
-F 2 "Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal" V 7430 1050 50  0001 C CNN
-F 3 "" H 7500 1050 50  0001 C CNN
-	1    7500 1050
-	1    0    0    -1  
-$EndComp
-Text Label 7500 750  0    60   ~ 0
-+5V
-Text Label 7650 1300 0    60   ~ 0
-/END
-Text Label 10750 3300 0    60   ~ 0
-/END
-Text Notes 6200 1000 0    60   ~ 0
-         Socket for\nArithmetic Processing Unit
+Text Notes 6250 1050 0    60   ~ 0
+APU Expansion Connector\n        (Am9511A)
 NoConn ~ 8050 5950
 Text Notes 4150 1000 0    60   ~ 0
 PLD\nAddress decoder logic
@@ -1336,8 +1317,6 @@ BS
 Text Label 1450 4700 2    60   ~ 0
 BA
 Text Label 3400 3600 0    60   ~ 0
-MRDY
-Text Label 7400 2000 0    60   ~ 0
 MRDY
 Text Label 10750 3100 0    60   ~ 0
 Q
@@ -1575,13 +1554,6 @@ Wire Wire Line
 	7200 4900 7200 5100
 Wire Wire Line
 	7200 5100 6900 5100
-Wire Wire Line
-	7500 750  7500 900 
-Wire Wire Line
-	7400 1300 7650 1300
-Wire Wire Line
-	7500 1200 7500 1300
-Connection ~ 7500 1300
 Connection ~ 700  2000
 Wire Wire Line
 	1050 1900 1500 1900
@@ -1713,34 +1685,17 @@ Wire Wire Line
 	10900 6000 10900 5900
 Connection ~ 10900 5900
 Wire Wire Line
-	5900 1600 6200 1600
-Wire Wire Line
-	6000 1700 6200 1700
-Wire Wire Line
 	6050 1300 6050 850 
-Wire Wire Line
-	6200 1500 5700 1500
-Wire Wire Line
-	5700 1500 5700 2750
-Wire Wire Line
-	5900 2750 5900 1600
-Wire Wire Line
-	6000 2750 6000 1700
-Text Label 5800 2750 1    60   ~ 0
-GND
 Text Notes 5400 3350 0    40   ~ 0
 Make sure that pin 3 and pin 4 are \nconnected together unless justified
 Text Label 6200 1800 2    60   ~ 0
 Q
-$Comp
-L Conn_01x04 J10
-U 1 1 5B99B0DD
-P 5900 2950
-F 0 "J10" V 6050 2900 50  0000 C CNN
-F 1 "Conn_01x04" H 5900 2650 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm" H 5900 2950 50  0001 C CNN
-F 3 "" H 5900 2950 50  0001 C CNN
-	1    5900 2950
-	0    1    1    0   
-$EndComp
+Text Label 7400 1500 0    60   ~ 0
+PC0
+NoConn ~ 6200 1500
+NoConn ~ 6200 1600
+NoConn ~ 6200 1700
+NoConn ~ 7400 2000
+NoConn ~ 7400 1300
+NoConn ~ 10750 3300
 $EndSCHEMATC

@@ -86,15 +86,14 @@
       (place J12 101000 -139000 front 90 (PN "HEADER 2x20"))
     )
     (component Resistors_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal
-      (place R1 166205 -92230 front 0 (PN 2.2k))
-      (place R2 166205 -85880 front 0 (PN 2.2k))
+      (place R1 166205 -92230 front 0 (PN 10k))
+      (place R2 166205 -85880 front 0 (PN 10k))
       (place R3 82500 -50500 front 0 (PN 2.2k))
-      (place R4 166205 -79530 front 0 (PN 2.2k))
-      (place R5 180810 -67465 front 270 (PN 2.2k))
-      (place R6 166205 -102580 front 0 (PN 2.2k))
-      (place R7 166205 -115280 front 0 (PN 2.2k))
-      (place R8 166205 -108930 front 0 (PN 2.2k))
-      (place R9 99000 -50500 front 0 (PN 2.2k))
+      (place R4 166205 -79530 front 0 (PN 10k))
+      (place R5 180810 -67465 front 270 (PN 10k))
+      (place R6 166205 -102580 front 0 (PN 10k))
+      (place R7 166205 -115280 front 0 (PN 10k))
+      (place R8 166205 -108930 front 0 (PN 10k))
       (place R10 62065 -101755 front 270 (PN 3.3k))
       (place R11 62065 -87785 front 270 (PN 10k))
     )
@@ -112,7 +111,7 @@
     (component "Housings_DIP:DIP-24_W15.24mm_Socket"
       (place U3 83000 -56500 front 0 (PN MC6850))
       (place U7 88000 -95500 front 0 (PN 8254))
-      (place U8 107000 -56500 front 0 (PN Am9511))
+      (place U8 107000 -56500 front 0 (PN "HEADER 2x12"))
     )
     (component "Housings_DIP:DIP-24_W7.62mm_Socket"
       (place U6 136995 -125250 front 180 (PN GAL20V8))
@@ -133,9 +132,6 @@
     )
     (component "Symbols:KiCad-Logo_6mm_SilkScreen"
       (place REF*** 172000 -139000 front 0 (PN "KiCad-Logo_6mm_SilkScreen"))
-    )
-    (component Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm
-      (place J10 105500 -129000 front 90 (PN Conn_01x04))
     )
   )
   (library
@@ -1147,27 +1143,6 @@
     )
     (image "Symbols:KiCad-Logo_6mm_SilkScreen"
     )
-    (image Pin_Headers:Pin_Header_Straight_1x04_Pitch2.54mm
-      (outline (path signal 100  -635 1270  1270 1270))
-      (outline (path signal 100  1270 1270  1270 -8890))
-      (outline (path signal 100  1270 -8890  -1270 -8890))
-      (outline (path signal 100  -1270 -8890  -1270 635))
-      (outline (path signal 100  -1270 635  -635 1270))
-      (outline (path signal 120  -1330 -8950  1330 -8950))
-      (outline (path signal 120  -1330 -1270  -1330 -8950))
-      (outline (path signal 120  1330 -1270  1330 -8950))
-      (outline (path signal 120  -1330 -1270  1330 -1270))
-      (outline (path signal 120  -1330 0  -1330 1330))
-      (outline (path signal 120  -1330 1330  0 1330))
-      (outline (path signal 50  -1800 1800  -1800 -9400))
-      (outline (path signal 50  -1800 -9400  1800 -9400))
-      (outline (path signal 50  1800 -9400  1800 1800))
-      (outline (path signal 50  1800 1800  -1800 1800))
-      (pin Rect[A]Pad_1700x1700_um 1 0 0)
-      (pin Oval[A]Pad_1700x1700_um 2 0 -2540)
-      (pin Oval[A]Pad_1700x1700_um 3 0 -5080)
-      (pin Oval[A]Pad_1700x1700_um 4 0 -7620)
-    )
     (padstack Round[A]Pad_1397_um
       (shape (circle F.Cu 1397))
       (shape (circle B.Cu 1397))
@@ -1207,15 +1182,15 @@
   (network
     (net /+5V
       (pins C1-1 C2-1 C3-1 C4-2 C5-2 C6-1 C8-2 C9-1 C11-2 C16-1 C17-1 J1-2 J3-2 J4-2
-        J8-1 J12-2 J13-1 R1-1 R2-1 R3-2 R4-1 R5-1 R6-1 R7-1 R8-1 R9-1 U1-8 U2-7 U3-8
-        U3-10 U3-12 U4-8 U5-26 U6-24 U7-14 U7-16 U7-11 U7-24 U8-2 U9-14 U10-28 U11-1
-        U11-27 U11-28 U13-14 C12-1 C13-1 U12-3)
+        J8-1 J12-2 J13-1 R1-1 R2-1 R3-2 R4-1 R5-1 R6-1 R7-1 R8-1 U1-8 U2-7 U3-8 U3-10
+        U3-12 U4-8 U5-26 U6-24 U7-14 U7-16 U7-11 U7-24 U8-2 U9-14 U10-28 U11-1 U11-27
+        U11-28 U13-14 C12-1 C13-1 U12-3)
     )
     (net /GND
       (pins C1-2 C2-2 C3-2 C4-1 C5-1 C6-2 C7-2 C8-1 C9-2 C11-1 C16-2 C17-2 J1-1 J3-1
         J4-1 J9-1 J11-2 J12-22 J13-2 SW1-2 SW1-2@1 U1-4 U2-1 U2-39 U3-1 U3-23 U3-24
-        U4-4 U5-7 U5-35 U6-12 U7-12 U8-1 U8-22 U9-9 U9-3 U9-11 U9-5 U9-13 U9-7 U10-14
-        U11-14 U13-7 J2-1 C12-2 C13-2 U12-2 J10-3)
+        U4-4 U5-7 U5-35 U6-12 U7-12 U8-1 U9-9 U9-3 U9-11 U9-5 U9-13 U9-7 U10-14 U11-14
+        U13-7 J2-1 C12-2 C13-2 U12-2)
     )
     (net /+12V
       (pins C7-1 J7-1 U8-16 U12-1)
@@ -1293,7 +1268,7 @@
       (pins J3-10 U5-22)
     )
     (net /PC0
-      (pins J4-3 U5-14)
+      (pins J4-3 U5-14 U8-22)
     )
     (net /PC7
       (pins J4-4 U5-10)
@@ -1393,9 +1368,6 @@
     )
     (net /A5
       (pins J12-27 U2-13 U6-7 U10-5 U11-5)
-    )
-    (net //END
-      (pins J12-28 R9-2 U8-24)
     )
     (net /A6
       (pins J12-29 U2-14 U6-6 U10-4 U11-4)
@@ -1503,28 +1475,37 @@
       (pins J12-24 U2-35 U8-6)
     )
     (net /MRDY
-      (pins R6-2 U2-36 U8-17)
+      (pins R6-2 U2-36)
     )
-    (net "Net-(J10-Pad2)"
-      (pins U8-4 J10-2)
+    (net "Net-(J12-Pad28)"
+      (pins J12-28)
     )
-    (net "Net-(J10-Pad1)"
-      (pins U8-5 J10-1)
+    (net "Net-(U8-Pad3)"
+      (pins U8-3)
     )
-    (net "Net-(J10-Pad4)"
-      (pins U8-3 J10-4)
+    (net "Net-(U8-Pad4)"
+      (pins U8-4)
     )
-    (class kicad_default "" //ACIA1CE //APUCE //BUFFER_FULL //END //FIRQ //HALT
+    (net "Net-(U8-Pad5)"
+      (pins U8-5)
+    )
+    (net "Net-(U8-Pad17)"
+      (pins U8-17)
+    )
+    (net "Net-(U8-Pad24)"
+      (pins U8-24)
+    )
+    (class kicad_default "" //ACIA1CE //APUCE //BUFFER_FULL //FIRQ //HALT
       //IRQ //NMI //OE //PITCE //PPICE //RAMWE //RESET //ROMCE //RTS //R_W
       /A0 /A1 /A10 /A11 /A12 /A13 /A14 /A15 /A2 /A3 /A4 /A5 /A6 /A7 /A8 /A9
       /AUDIO_IN /AUDIO_OUT /BA /BS /D0 /D1 /D2 /D3 /D4 /D5 /D6 /D7 /E /EXTAL
       /MRDY /OUT0 /OUT1 /PA0 /PA1 /PA2 /PA3 /PA4 /PA5 /PA6 /PA7 /PB0 /PB1
       /PB2 /PB3 /PB4 /PB5 /PB6 /PB7 /PC0 /PC1 /PC2 /PC3 /PC4 /PC5 /PC6 /PC7
-      /Q /RXD /R_/W /SCLK /TXD "Net-(C10-Pad1)" "Net-(C14-Pad1)" "Net-(J10-Pad1)"
-      "Net-(J10-Pad2)" "Net-(J10-Pad4)" "Net-(J2-Pad3)" "Net-(J2-Pad6)" "Net-(R10-Pad1)"
-      "Net-(R8-Pad2)" "Net-(U1-Pad1)" "Net-(U3-Pad5)" "Net-(U4-Pad1)" "Net-(U6-Pad13)"
-      "Net-(U7-Pad15)" "Net-(U8-Pad7)" "Net-(U9-Pad10)" "Net-(U9-Pad12)" "Net-(U9-Pad4)"
-      "Net-(U9-Pad6)" "Net-(U9-Pad8)"
+      /Q /RXD /R_/W /SCLK /TXD "Net-(C10-Pad1)" "Net-(C14-Pad1)" "Net-(J12-Pad28)"
+      "Net-(J2-Pad3)" "Net-(J2-Pad6)" "Net-(R10-Pad1)" "Net-(R8-Pad2)" "Net-(U1-Pad1)"
+      "Net-(U3-Pad5)" "Net-(U4-Pad1)" "Net-(U6-Pad13)" "Net-(U7-Pad15)" "Net-(U8-Pad17)"
+      "Net-(U8-Pad24)" "Net-(U8-Pad3)" "Net-(U8-Pad4)" "Net-(U8-Pad5)" "Net-(U8-Pad7)"
+      "Net-(U9-Pad10)" "Net-(U9-Pad12)" "Net-(U9-Pad4)" "Net-(U9-Pad6)" "Net-(U9-Pad8)"
       (circuit
         (use_via Via[0-1]_800:400_um)
       )
