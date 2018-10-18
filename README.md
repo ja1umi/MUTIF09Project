@@ -10,7 +10,7 @@ FAQ
 
 2. What does MUTIF mean?
 
-    MUTIF is an anagram of my two amaterur radio call signs of my own (suffix only).
+    MUTIF is an anagram of two amaterur radio call signs of my own (suffix only).
 
 3. How to assemble this thing? / Where is the assembly manual?
 
@@ -18,3 +18,9 @@ FAQ
 
     Like other open source projects, documents, sample programs and ohter design materials contained in this repository are provided "as is" without warranty.
 
+    As for assembly manual, you can download the document titled *"Technical memorandum on MUTIF09 6809 Single Board Computer"* for a fee below.
+
+    https://m-nihombashi.booth.pm/items/104543
+    
+    Or, you can get a copy at *doujinshi* sales exhibitions (e.g. Comic Maket, TechBookFest).
+    
