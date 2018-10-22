@@ -1,0 +1,38 @@
+Name     IOEXPADDRDECODE;
+PartNo   16V8;
+Date     9/21/2018;
+Revision 02;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g16v8a;
+
+/* *************** INPUT PINS *********************/
+PIN 1   =   A15;                /* system address A15 - A8 */
+PIN 2   =   A14;
+PIN 3   =   A13;
+PIN 4   =   A12;
+PIN 5   =   A11;
+PIN 6   =   A10;
+PIN 7   =   A9;
+PIN 8   =   A8;
+PIN 9   =   A7;
+PIN 11  =   A6;
+PIN 12  =   A5;
+PIN 13  =   A4;
+PIN 14  =   A3;
+/* PIN 15  =   A2;  */
+/* PIN 16  =   A1;  */
+/* PIN 17  =   A0;  */
+
+FIELD ADDRESS = [A15..A8];                  
+
+/* *************** OUTPUT PINS *********************/
+PIN 18  =   UARTCE;
+
+/* Intermediate Variable Definitions  */
+IOEQN   = ADDRESS:[B0XX .. B0XX];                               /* Memory-mapped I/O, $B000 .. $B0FF        */
+
+/* Logic Equations */
+UARTCE  = !(IOEQN & !A7 & !A6 & A5 & !A4 & !A3);	/* UART PC16550D, $B020 .. $B027 */
