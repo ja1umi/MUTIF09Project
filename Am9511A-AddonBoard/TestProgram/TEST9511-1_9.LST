@@ -1,0 +1,102 @@
+                      * Am9511A TEST PROGRAM (1-9) FOR MPB6809 MONITOR
+                      *
+                      * make sure to connect RESET pin of Am9511A to PC0 pin of 8255A
+                      *
+F0E6                  PUTCH   EQU $F0E6
+F0C7                  GETCH   EQU $F0C7
+F13E                  CONTRL  EQU $F13E
+F0FF                  OUT4HS  EQU $F0FF
+F101                  OUT2HS  EQU $F101
+                      *
+B004                  APUDA   EQU $B004
+B005                  APUCS   EQU $B005
+B010                  PPIPA   EQU $B010
+B011                  PPIPB   EQU $B011
+B012                  PPIPC   EQU $B012
+B013                  PPICS   EQU $B013
+                      *
+0000                  NOP     EQU $00
+002C                  DADD    EQU $2C
+002D                  DSUB    EQU $2D
+001C                  FLTD    EQU $1C
+0012                  FMUL    EQU $12
+0017                  PTOF    EQU $17                 ;TOS is copied into the new TOS location
+0034                  CHSD    EQU $34                 ;32-bit fixed-point sign change
+006F                  SDIV    EQU $6F
+0001                  SQRT    EQU $01
+001A                  PUPI    EQU $1A                 ;push 32-bit floating-point pi 
+                      *
+0100                          ORG $100
+0100  10CE7000                LDS #$7000
+0104  308C58          START   LEAX MSG,PCR
+0107  8D44                    BSR PMSG
+                      *
+0109  8680                    LDA #$80                ;condifure 8255A Port A, B and C (Px0 - Px7) for output
+010B  B7B013                  STA PPICS
+010E  8601                    LDA #$01                ;enter BSR mode. make PC0 high for resetting Am9511A
+0110  B7B013                  STA PPICS               ;RESET must be high for at least 5 CLK periods, as per datasheet of Am9511A 
+0113  1F11                    TFR X,X                 ;wait for 18 (= 6 x 3) cycles before end of reset
+0115  1F11                    TFR X,X                 ;(assuming that E Clock from 6809 is fed to the CLK pin of Am9511A by default)
+0117  1F11                    TFR X,X
+0119  4F                      CLRA                    ;make PC0 low. end of reset. The stack pointer of Am9511 is now (re-)initialized
+011A  B7B013                  STA PPICS
+                      *
+011D  8E0200                  LDX #INPUT
+0120  C610                    LDB #16
+0122  A680            L1      LDA ,X+
+0124  B7B004                  STA APUDA
+0127  12                      NOP
+0128  5A                      DECB
+0129  26F7                    BNE L1
+                      *
+012B  861C                    LDA #FLTD
+012D  B7B005                  STA APUCS
+0130  8D25                    BSR WAIT
+0132  8601                    LDA #SQRT
+0134  B7B005                  STA APUCS
+0137  8D1E                    BSR WAIT
+                      *       STA STAT
+                      *
+                      *       LDA APUDA
+                      *       NOP
+0139  8E0210                  LDX #OUTPUT
+013C  308810                  LEAX 16,X
+013F  C610                    LDB #16
+0141  B6B004          L2      LDA APUDA
+0144  12                      NOP
+0145  A782                    STA ,-X
+0147  5A                      DECB
+0148  26F7                    BNE L2
+                      *
+014A  7EF13E                  JMP CONTRL              ;return to monitor command line
+                      *
+014D  A680            PMSG    LDA ,X+
+014F  2705                    BEQ QUIT1
+0151  BDF0E6                  JSR PUTCH
+0154  20F7                    BRA PMSG
+0156  39              QUIT1   RTS
+                      *
+                      *WAIT   LDA APUCS               ;make an empty read
+                      *       NOP
+0157  B6B005          WAIT    LDA APUCS
+015A  8580                    BITA #%10000000         ;check for busy flag
+015C  26F9                    BNE WAIT                ;wait for completion of command execution
+015E  39                      RTS                     ;return status in accumulator A
+                      *
+015F  0D0A            MSG     FCB $0D, $0A
+0161  414D393531314120         FCC /AM9511A /
+0169  54455354                FCC /TEST/
+016D  2D39                    FCC /-9/
+016F  0D0A00                  FCB $0D, $0A, 0
+                      *
+0200                          ORG $200
+                      *INPUT  RMB 16
+0200  00010203        INPUT   FCB $00, $01, $02, $03
+0204  04050607                FCB $04, $05, $06, $07
+0208  08090A0B                FCB $08, $09, $0A, $0B
+020C  02000000                FCB $02, $00, $00, $00
+0210                  OUTPUT  RMB 16
+                      *       ORG $230
+                      *STAT   RMB 1
+                      *
+                              END
