@@ -8,8 +8,9 @@
  1-1. Install Am9511A Add-on board onto the MUTIF09 6809 SBC.
 
  1-2. Make the following connections:
- 1) Pin 35 of 6809 (Q) to header pin named "Q" on the Add-on board
- 2) Header pin 3 (PC0) of GPIO Port C to pin 22 (RESET) of Am9511A
+ 1) Pin 35 of 6809 (Q) to header pin 6 of the connector J1 (2x12) on the Add-on board. See also schematic diagram (for MUTIF09 6809 SBC PCB Rev.1 only).
+ 2) Header pin 3 (PC0) of GPIO Port C to pin 22 (RESET) of Am9511A (for MUTIF09 6809 SBC PCB Rev.1 only)
+ 3) Pin 36 of 6809 (MRDY) to header pin 5 of the connector J2 (1x6) on the Add-on board. See also schematic diagram (for MUTIF 6809 SBC PCB Rev.3).
 
 ### Software Setup (1)
 
@@ -41,8 +42,10 @@ Lastly, the contents of the stack are *popped (pulled)* and stored at memory loc
 
 ## 5. Things to be noted
 
-You can find *"empty read"* lines in the aseembly listing of this program. The necessity of these *"empty read"* is unexpected but essential to retrieve correct data/status.
+~~You can find *"empty read"* lines in the aseembly listing of this program. The necessity of these *"empty read"* is unexpected but essential to retrieve correct data/status.~~
 
-To make matters worse, such *"empty read"* disturbs Am9511A's stack pointer when *popping* data from the stack. The forced RESET at the beginning of the program by 8255A is the *ad hoc* solution I found.
+~~To make matters worse, such *"empty read"* disturbs Am9511A's stack pointer when *popping* data from the stack. The forced RESET at the beginning of the program by 8255A is the *ad hoc* solution I found.~~
 
-I wonder if some kind of timing issue still exists regarding read-operation.
+~~I wonder if some kind of timing issue still exists regarding read-operation.~~
+
+Now *"empty read"* was eliminated. The timing issue was resolved by connecting 6809 MRDY pin and Am9511A /PAUSE pin with weak pull-up resistor (10k ohm).
