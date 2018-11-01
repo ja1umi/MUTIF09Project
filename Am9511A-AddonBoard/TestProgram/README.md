@@ -1,4 +1,4 @@
-# Test Program for Am9511A (TEST9511-1_8.ASM)
+# Test Program for Am9511A (TEST9511-1_9.ASM)
 
  This is a small test program for checking functionality of Am9511A, the arithmeric co-processor, by calculating square root.
 
@@ -18,7 +18,7 @@ Burn the MPB6809 Monitor Program to a UVEPROM/EEPROM and install in on the sbc. 
 
 ### Software Setup (2)
 
-Write the test program (binaries) into SRAM using MPB6809 Monitor Program.
+Input the assembled machine code (see TEST9511-1_9.LST) byte by byte manually using MPB6809 Monitor Program.
 
 ### Test Data Preparation
 
