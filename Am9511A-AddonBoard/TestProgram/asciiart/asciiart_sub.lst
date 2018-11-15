@@ -1,0 +1,241 @@
+                      * Subroutine for asciiart.bas
+                      *
+                      * make sure to connect RESET pin of Am9511A to PC0 pin of 8255A
+                      *
+B004                  APUDA   EQU $B004
+B005                  APUCS   EQU $B005
+B010                  PPIPA   EQU $B010
+B011                  PPIPB   EQU $B011
+B012                  PPIPC   EQU $B012
+B013                  PPICS   EQU $B013
+                      *
+0017                  CMD_PTOF        EQU $17         ;TOS is copied into the new TOS location
+0012                  CMD_FMUL        EQU $12
+0011                  CMD_FSUB        EQU $11
+0010                  CMD_FADD        EQU $10
+001E                  CMD_FIXD        EQU $1E         ;32-bit floating point to 32-bit fixed point
+001C                  CMD_FLTD        EQU $1C         ;32-bit fixed point to 32-bit floating point                    ;
+001A                  CMD_PUPI        EQU $1A         ;push 32-bit floating-point pi
+002D                  CMD_DSUB        EQU $2D 
+                      *
+7800                          ORG $7800
+                      *
+                      *30 CA=X*0.0458
+                      *40 CB=Y*0.08333
+                      *50 A=CA
+                      *60 B=CB
+                      *
+7800  308D0156        L30_60  LEAX C0458,PCR          ;30 CA=(X-39)*0.0458
+7804  170116                  LBSR LOAD
+7807  308D0163                LEAX VARX,PCR
+780B  17010F                  LBSR LOAD
+780E  308D0154                LEAX C39D,PCR
+7812  170108                  LBSR LOAD
+7815  1700EC                  LBSR DSUB
+7818  1700CD                  LBSR FLTD
+781B  1700D2                  LBSR FMUL
+781E  308D0154                LEAX VARCA,PCR
+7822  17010F                  LBSR STORE
+7825  308D0135                LEAX C0833,PCR          ;40 CB=(Y-12)*0.08333
+7829  1700F1                  LBSR LOAD
+782C  308D0142                LEAX VARY,PCR
+7830  1700EA                  LBSR LOAD
+7833  308D0133                LEAX C12D,PCR
+7837  1700E3                  LBSR LOAD
+783A  1700C7                  LBSR DSUB
+783D  1700A8                  LBSR FLTD
+7840  1700AD                  LBSR FMUL
+7843  308D0133                LEAX VARCB,PCR
+7847  1700EA                  LBSR STORE
+784A  308D0128                LEAX VARCA,PCR          ;50 A=CA
+784E  318D012C                LEAY VARA,PCR
+7852  1700F4                  LBSR ASSIGN
+7855  308D0121                LEAX VARCB,PCR          ;60 B=CB
+7859  318D0125                LEAY VARB,PCR
+785D  1700E9                  LBSR ASSIGN
+7860  39                      RTS
+                      *
+                      *80 T=A*A-B*B+CA
+                      *90 B=2*A*B+CB
+                      *100 A=T
+                      *
+7861  308D0119        L80_110 LEAX VARA,PCR           ;80 T=A*A-B*B+CA
+7865  1700B5                  LBSR LOAD
+7868  170081                  LBSR PTOF
+786B  170082                  LBSR FMUL
+786E  308D0110                LEAX VARB,PCR
+7872  1700A8                  LBSR LOAD
+7875  8D75                    BSR PTOF
+7877  8D77                    BSR FMUL
+7879  170080                  LBSR FSUB
+787C  308D00F6                LEAX VARCA,PCR
+7880  17009A                  LBSR LOAD
+7883  8D6F                    BSR FADD
+7885  308D00FD                LEAX VART,PCR
+7889  1700A8                  LBSR STORE
+788C  308D00D2                LEAX C2,PCR             ;90 B=2*A*B+CB
+7890  17008A                  LBSR LOAD
+7893  308D00E7                LEAX VARA,PCR
+7897  170083                  LBSR LOAD
+789A  308D00E4                LEAX VARB,PCR
+789E  8D7D                    BSR LOAD
+78A0  8D4E                    BSR FMUL
+78A2  8D4C                    BSR FMUL
+78A4  308D00D2                LEAX VARCB,PCR
+78A8  8D73                    BSR LOAD
+78AA  8D48                    BSR FADD
+78AC  308D00D2                LEAX VARB,PCR
+78B0  170081                  LBSR STORE
+78B3  308D00CF                LEAX VART,PCR           ;100 A=T
+78B7  318D00C3                LEAY VARA,PCR
+78BB  17008B                  LBSR ASSIGN
+                      *
+                      *110 IF (A*A+B*B)>4 THEN GOTO 200
+                      *
+78BE  308D00BC                LEAX VARA,PCR           ;A*A+B*B -> TMP
+78C2  8D59                    BSR LOAD
+78C4  8D26                    BSR PTOF
+78C6  8D28                    BSR FMUL
+78C8  308D00B6                LEAX VARB,PCR
+78CC  8D4F                    BSR LOAD
+78CE  8D1C                    BSR PTOF
+78D0  8D1E                    BSR FMUL
+78D2  8D20                    BSR FADD
+78D4  8D22                    BSR FIXD
+78D6  308D00B0                LEAX TMP,PCR
+78DA  8D58                    BSR STORE
+78DC  39                      RTS
+                      *
+                      * Send command word and wait for the completion of the command
+                      * On entry: A = command word
+                      * On return: Accumulator A is altered by the subroutine
+78DD  B7B005          EXEC    STA APUCS
+78E0  B6B005          WAIT    LDA APUCS
+78E3  8580                    BITA #%10000000         ;check for busy flag
+78E5  26F9                    BNE WAIT                ;wait for completion of command execution
+78E7  39                      RTS                     ;return status in accumulator A
+                      *
+                      * 32-bit fixed point intger operand A at the TOS is converted to a 32-bit floating point number
+                      *
+78E8  861C            FLTD    LDA #CMD_FLTD
+78EA  20F1                    BRA EXEC
+                      *
+                      * The current TOS is copied into the TOS
+                      *
+78EC  8617            PTOF    LDA #CMD_PTOF
+78EE  20ED                    BRA EXEC
+                      *
+                      * 32-bit floating point operand A at the TOS is multiplied by the 32-bit floating point operand B at the NOS
+                      *
+78F0  8612            FMUL    LDA #CMD_FMUL
+78F2  20E9                    BRA EXEC
+                      *
+                      * 32-bit floating point operand A at the TOS is added to 32-bit floaring point operand B at the NOS
+                      *
+78F4  8610            FADD    LDA #CMD_FADD
+78F6  20E5                    BRA EXEC
+                      *
+                      * 32-bit floating point operand A at the TOS is converted to a 32-bit fixed point integer
+                      *
+78F8  861E            FIXD    LDA #CMD_FIXD
+78FA  20E1                    BRA EXEC
+                      *
+                      * 32-bit floating point operand A at the TOS is subtracted from 32-bit floating point operand B at the NOS
+78FC  8611            FSUB    LDA #CMD_FSUB
+78FE  20DD                    BRA EXEC
+                      *
+                      * 32-bit floating point Pi is entered into TOS
+                      *
+7900  861A            PUPI    LDA #CMD_PUPI
+7902  20D9                    BRA EXEC
+                      *
+                      * 32-bit fixed point operand A at the TOS is subtracted from 32-bit fixed point operand B at the NOS
+                      *
+7904  862D            DSUB    LDA #CMD_DSUB
+7906  20D5                    BRA EXEC
+                      *
+                      * APU initialization
+                      * On entry: no parameters required
+                      * On return: Accumulator A and index register X are altered by the subroutine
+                      *
+7908  8680            INIT    LDA #$80                ;condifure 8255A Port A, B and C (Px0 - Px7) for output
+790A  B7B013                  STA PPICS
+790D  8601                    LDA #$01                ;enter BSR mode. make PC0 high for resetting Am9511A
+790F  B7B013                  STA PPICS               ;RESET must be high for at least 5 CLK periods, as per datasheet of Am9511A 
+7912  1F11                    TFR X,X                 ;wait for 18 (= 6 x 3) cycles before end of reset
+7914  1F11                    TFR X,X                 ;(assuming that E Clock from 6809 is fed to the CLK pin of Am9511A by default)
+7916  1F11                    TFR X,X
+7918  4F                      CLRA                    ;make PC0 low. end of reset. The stack pointer of Am9511 is now (re-)initialized
+7919  B7B013                  STA PPICS
+791C  39                      RTS
+                      *
+                      * Load APU stack
+                      * On entry: X = pointer to the floating point constant or variable
+                      * On return: Accumulator A is altered by the subroutine 
+                      *
+791D  3004            LOAD    LEAX 4,X
+791F  A682                    LDA ,-X
+7921  B7B004                  STA APUDA
+                      *       NOP
+7924  A682                    LDA ,-X
+7926  B7B004                  STA APUDA
+                      *       NOP
+7929  A682                    LDA ,-X
+792B  B7B004                  STA APUDA
+                      *       NOP
+792E  A682                    LDA ,-X
+7930  B7B004                  STA APUDA
+                      *       NOP
+7933  39                      RTS
+                      *
+                      * Read data from APU stack and store them
+                      * On entry: X = pointer to the floatinig point variable
+                      * On return: Accumulator A is altered by the subroutine
+                      *
+7934  B6B004          STORE   LDA APUDA
+                      *       NOP
+7937  A780                    STA ,X+
+7939  B6B004                  LDA APUDA
+                      *       NOP
+793C  A780                    STA ,X+
+793E  B6B004                  LDA APUDA
+                      *       NOP
+7941  A780                    STA ,X+
+7943  B6B004                  LDA APUDA
+                      *       NOP
+7946  A780                    STA ,X+
+7948  39                      RTS
+                      *
+                      * Assign data to variable specified
+                      * X = pointer to the floating point constant or variable (source)
+                      * Y = pointer to the floating point variable (destination)
+                      * Accumulator A, index register X and Y are atlered by the subroutine
+                      *
+7949  A680            ASSIGN  LDA ,X+
+794B  A7A0                    STA ,Y+
+794D  A680                    LDA ,X+
+794F  A7A0                    STA ,Y+
+7951  A680                    LDA ,X+
+7953  A7A0                    STA ,Y+
+7955  A680                    LDA ,X+
+7957  A7A0                    STA ,Y+
+7959  39                      RTS
+                      *
+795A  7CBB98C8        C0458   FCB $7C, $BB, $98, $C8  ;0.0458
+795E  7DAAA8EB        C0833   FCB $7D, $AA, $A8, $EB  ;0.08333
+7962  02800000        C2      FCB $02, $80, $00, $00  ;2.0
+7966  00000027        C39D    FCB 0, 0, 0, 39         ;39 (fixed point integer. Most signigicant byte first)
+796A  0000000C        C12D    FCB 0, 0, 0, 12         ;12 (fixed point integer. Most signigicant byte first)
+796E  000000          VARX    FCB 0, 0, 0             ;fixed point integer
+7971  00                      FCB 0                   ;least signigicant byte
+7972  000000          VARY    FCB 0, 0, 0             ;fixed point integer
+7975  00                      FCB 0                   ;least signigicant byte
+7976                  VARCA   RMB 4
+797A                  VARCB   RMB 4
+797E                  VARA    RMB 4
+7982                  VARB    RMB 4
+7986                  VART    RMB 4
+798A                  TMP     RMB 3
+798D                          RMB 1                   ;least signigicant byte
+                      *
+                              END
