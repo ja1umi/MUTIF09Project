@@ -1,6 +1,6 @@
 # *asciiart-apu_b.bas* benchmark for MUTIF09 6809 SBC running MS Extended BASIC with AMD Am9511A-1DC APU installed
 
-Original BASIC source program are available at the following URL: https://www.retrobrewcomputers.org/forum/index.php?t=msg&th=201&goto=4704&#msg_4704
+Original BASIC source program is available at the following URL: https://www.retrobrewcomputers.org/forum/index.php?t=msg&th=201&goto=4704&#msg_4704
 
 Approximately 1m23s (68B09 2.0125 MHz and Am9511A-1DC 3.0 MHz)
 
