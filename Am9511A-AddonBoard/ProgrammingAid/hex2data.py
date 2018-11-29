@@ -6,14 +6,15 @@ parser = argparse.ArgumentParser()
 
 if sys.stdin.isatty():
     parser.add_argument("fname", help="file in intel hex format", type=str)
-parser.add_argument("-n","--num",help="first line number",type=int)
-parser.add_argument("-i","--inc",help="line number increment",type=int)
-args=parser.parse_args()
+parser.add_argument("-n","--lnum", help="first line number", type=int)
+parser.add_argument("-i","--inc", help="line number increment", type=int)
+parser.add_argument("--noterm", help="supress end-of-data terminator", default=False, action="store_true")
+args = parser.parse_args()
 
-if args.num == None:
+if args.lnum == None:
     lnum = 1000         #Set defalut line number
 else:
-    lnum = args.num
+    lnum = args.lnum
 if args.inc == None:
     inc = 10            #Set default line number increment
 else:
@@ -40,4 +41,6 @@ for str in hex_file:            #Read the file in Intel HEX format line by line
         lnum += inc
         s = ''
 
+if not args.noterm:
+    print(lnum, 'DATA **')
 hex_file.close()
