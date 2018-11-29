@@ -1,0 +1,162 @@
+                      * Subroutine for cumerr.bas
+                      *
+                      * make sure to connect RESET pin of Am9511A to PC0 pin of 8255A
+                      *
+B004                  APUDA   EQU $B004
+B005                  APUCS   EQU $B005
+B010                  PPIPA   EQU $B010
+B011                  PPIPB   EQU $B011
+B012                  PPIPC   EQU $B012
+B013                  PPICS   EQU $B013
+                      *
+0017                  CMD_PTOF        EQU $17         ;TOS is copied into the new TOS location
+0012                  CMD_FMUL        EQU $12
+0011                  CMD_FSUB        EQU $11
+0010                  CMD_FADD        EQU $10
+001E                  CMD_FIXD        EQU $1E         ;32-bit floating point to 32-bit fixed point
+001C                  CMD_FLTD        EQU $1C         ;32-bit fixed point to 32-bit floating point
+001A                  CMD_PUPI        EQU $1A         ;push 32-bit floating-point pi
+002D                  CMD_DSUB        EQU $2D
+                      *
+7800                          ORG $7800
+                      *
+7800  8D56            START   BSR INIT
+7802  308D00A4                LEAX C0,PCR             ;zero-clear the result
+7806  8D65                    BSR LOAD
+7808  8D2E                    BSR FLTD
+780A  8D30                    BSR PTOF
+780C  308D00A6                LEAX FZERO,PCR
+7810  8D72                    BSR STORE
+7812  CC2710                  LDD #10000              ;add 0.01 ten thousand (10000) times
+7815  3406            L1      PSHS D
+7817  308D0093                LEAX C001,PCR
+781B  8D50                    BSR LOAD
+781D  8D25                    BSR FADD
+781F  3506                    PULS D
+7821  830001                  SUBD #1
+7824  26EF                    BNE L1
+7826  308D0088                LEAX RESULT,PCR
+782A  8D58                    BSR STORE
+782C  39                      RTS     
+                      *
+                      * Send command word and wait for the completion of the command
+                      * On entry: A = command word
+                      * On return: Accumulator A is altered by the subroutine
+782D  B7B005          EXEC    STA APUCS
+7830  B6B005          WAIT    LDA APUCS
+7833  8580                    BITA #%10000000         ;check for busy flag
+7835  26F9                    BNE WAIT                ;wait for completion of command execution
+7837  39                      RTS                     ;return status in accumulator A
+                      *
+                      * 32-bit fixed point intger operand A at the TOS is converted to a 32-bit floating point number
+                      *
+7838  861C            FLTD    LDA #CMD_FLTD
+783A  20F1                    BRA EXEC
+                      *
+                      * The current TOS is copied into the TOS
+                      *
+783C  8617            PTOF    LDA #CMD_PTOF
+783E  20ED                    BRA EXEC
+                      *
+                      * 32-bit floating point operand A at the TOS is multiplied by the 32-bit floating point operand B at the NOS
+                      *
+7840  8612            FMUL    LDA #CMD_FMUL
+7842  20E9                    BRA EXEC
+                      *
+                      * 32-bit floating point operand A at the TOS is added to 32-bit floaring point operand B at the NOS
+                      *
+7844  8610            FADD    LDA #CMD_FADD
+7846  20E5                    BRA EXEC
+                      *
+                      * 32-bit floating point operand A at the TOS is converted to a 32-bit fixed point integer
+                      *
+7848  861E            FIXD    LDA #CMD_FIXD
+784A  20E1                    BRA EXEC
+                      *
+                      * 32-bit floating point operand A at the TOS is subtracted from 32-bit floating point operand B at the NOS
+784C  8611            FSUB    LDA #CMD_FSUB
+784E  20DD                    BRA EXEC
+                      *
+                      * 32-bit floating point Pi is entered into TOS
+                      *
+7850  861A            PUPI    LDA #CMD_PUPI
+7852  20D9                    BRA EXEC
+                      *
+                      * 32-bit fixed point operand A at the TOS is subtracted from 32-bit fixed point operand B at the NOS
+                      *
+7854  862D            DSUB    LDA #CMD_DSUB
+7856  20D5                    BRA EXEC
+                      *
+                      * APU initialization
+                      * On entry: no parameters required
+                      * On return: Accumulator A and index register X are altered by the subroutine
+                      *
+7858  8680            INIT    LDA #$80                ;condifure 8255A Port A, B and C (Px0 - Px7) for output
+785A  B7B013                  STA PPICS
+785D  8601                    LDA #$01                ;enter BSR mode. make PC0 high for resetting Am9511A
+785F  B7B013                  STA PPICS               ;RESET must be high for at least 5 CLK periods, as per datasheet of Am9511A 
+7862  1F11                    TFR X,X                 ;wait for 18 (= 6 x 3) cycles before end of reset
+7864  1F11                    TFR X,X                 ;(assuming that E Clock from 6809 is fed to the CLK pin of Am9511A by default)
+7866  1F11                    TFR X,X
+7868  4F                      CLRA                    ;make PC0 low. end of reset. The stack pointer of Am9511 is now (re-)initialized
+7869  B7B013                  STA PPICS
+786C  39                      RTS
+                      *
+                      * Load APU stack
+                      * On entry: X = pointer to the floating point constant or variable
+                      * On return: Accumulator A is altered by the subroutine 
+                      *
+786D  3004            LOAD    LEAX 4,X
+786F  A682                    LDA ,-X
+7871  B7B004                  STA APUDA
+                      *       NOP
+7874  A682                    LDA ,-X
+7876  B7B004                  STA APUDA
+                      *       NOP
+7879  A682                    LDA ,-X
+787B  B7B004                  STA APUDA
+                      *       NOP
+787E  A682                    LDA ,-X
+7880  B7B004                  STA APUDA
+                      *       NOP
+7883  39                      RTS
+                      *
+                      * Read data from APU stack and store them
+                      * On entry: X = pointer to the floatinig point variable
+                      * On return: Accumulator A is altered by the subroutine
+                      *
+7884  B6B004          STORE   LDA APUDA
+                      *       NOP
+7887  A780                    STA ,X+
+7889  B6B004                  LDA APUDA
+                      *       NOP
+788C  A780                    STA ,X+
+788E  B6B004                  LDA APUDA
+                      *       NOP
+7891  A780                    STA ,X+
+7893  B6B004                  LDA APUDA
+                      *       NOP
+7896  A780                    STA ,X+
+7898  39                      RTS
+                      *
+                      * Assign data to variable specified
+                      * X = pointer to the floating point constant or variable (source)
+                      * Y = pointer to the floating point variable (destination)
+                      * Accumulator A, index register X and Y are atlered by the subroutine
+                      *
+7899  A680            ASSIGN  LDA ,X+
+789B  A7A0                    STA ,Y+
+789D  A680                    LDA ,X+
+789F  A7A0                    STA ,Y+
+78A1  A680                    LDA ,X+
+78A3  A7A0                    STA ,Y+
+78A5  A680                    LDA ,X+
+78A7  A7A0                    STA ,Y+
+78A9  39                      RTS
+                      *
+78AA  00000000        C0      FCB 0, 0, 0, 0          ;0 (32-bit fixed point)
+78AE  7AA3D70A        C001    FCB $7A, $A3, $D7, $0A  ;0.01
+78B2                  RESULT  RMB 4
+78B6                  FZERO   RMB 4
+                      *
+                              END
