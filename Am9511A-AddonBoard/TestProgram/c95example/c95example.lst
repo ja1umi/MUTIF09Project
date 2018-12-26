@@ -1,0 +1,92 @@
+                      * Am9511A sample program to calculate square root of 2
+                      *
+                      * make sure to connect RESET pin of Am9511A to PC0 pin of 8255A
+                      *
+B004                  APUDA   EQU $B004
+B005                  APUCS   EQU $B005
+B010                  PPIPA   EQU $B010
+B011                  PPIPB   EQU $B011
+B012                  PPIPC   EQU $B012
+B013                  PPICS   EQU $B013
+                      *
+001C                  CMD_FLTD        EQU $1C         ;32-bit fixed point to 32-bit floating point
+0001                  CMD_SQRT        EQU $01
+                      *
+7800                          ORG $7800
+                      *
+7800  8D22            START   BSR INIT
+7802  308C60                  LEAX C2,PCR             ;load (push) 32-bit fixed point constant 2 onto the stack
+7805  8D32                    BSR LOAD
+7807  8D13                    BSR FLTD
+7809  8D15                    BSR SQRT
+780B  308C5B                  LEAX RESULT,PCR         ;Pop the result from the stack and store it 
+780E  8D40                    BSR STORE
+7810  39                      RTS     
+                      *
+                      * Send command word and wait for the completion of the command
+                      * On entry: A = command word
+                      * On return: Accumulator A is altered by the subroutine
+7811  B7B005          EXEC    STA APUCS
+7814  B6B005          WAIT    LDA APUCS
+7817  8580                    BITA #%10000000         ;check for busy flag
+7819  26F9                    BNE WAIT                ;wait for completion of command execution
+781B  39                      RTS                     ;return status in accumulator A
+                      *
+                      * 32-bit fixed point intger operand A at the TOS is converted to a 32-bit floating point number
+                      *
+781C  861C            FLTD    LDA #CMD_FLTD
+781E  20F1                    BRA EXEC
+                      *
+                      * 32-bit floaring point operand A at the TOS is replaced by the 32-bit floating point sqrt(2)
+                      *
+7820  8601            SQRT    LDA #CMD_SQRT
+7822  20ED                    BRA EXEC
+                      *
+                      * APU initialization
+                      * On entry: no parameters required
+                      * On return: Accumulator A and index register X are altered by the subroutine
+                      *
+7824  8680            INIT    LDA #$80                ;condifure 8255A Port A, B and C (Px0 - Px7) for output
+7826  B7B013                  STA PPICS
+7829  8601                    LDA #$01                ;enter BSR mode. make PC0 high for resetting Am9511A
+782B  B7B013                  STA PPICS               ;RESET must be high for at least 5 CLK periods, as per datasheet of Am9511A 
+782E  1F11                    TFR X,X                 ;wait for 18 (= 6 x 3) cycles before end of reset
+7830  1F11                    TFR X,X                 ;(assuming that E Clock from 6809 is fed to the CLK pin of Am9511A by default)
+7832  1F11                    TFR X,X
+7834  4F                      CLRA                    ;make PC0 low. end of reset. The stack pointer of Am9511 is now (re-)initialized
+7835  B7B013                  STA PPICS
+7838  39                      RTS
+                      *
+                      * Load APU stack
+                      * On entry: X = pointer to the floating point constant or variable
+                      * On return: Accumulator A is altered by the subroutine 
+                      *
+7839  3004            LOAD    LEAX 4,X
+783B  A682                    LDA ,-X
+783D  B7B004                  STA APUDA
+7840  A682                    LDA ,-X
+7842  B7B004                  STA APUDA
+7845  A682                    LDA ,-X
+7847  B7B004                  STA APUDA
+784A  A682                    LDA ,-X
+784C  B7B004                  STA APUDA
+784F  39                      RTS
+                      *
+                      * Read data from APU stack and store them
+                      * On entry: X = pointer to the floatinig point variable
+                      * On return: Accumulator A is altered by the subroutine
+                      *
+7850  B6B004          STORE   LDA APUDA
+7853  A780                    STA ,X+
+7855  B6B004                  LDA APUDA
+7858  A780                    STA ,X+
+785A  B6B004                  LDA APUDA
+785D  A780                    STA ,X+
+785F  B6B004                  LDA APUDA
+7862  A780                    STA ,X+
+7864  39                      RTS
+                      *
+7865  00000002        C2      FCB 0, 0, 0, 2          ;2 (32-bit fixed point)
+7869                  RESULT  RMB 4                   ;(32-bit floating point)
+                      *
+                              END
