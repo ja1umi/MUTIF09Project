@@ -11,7 +11,7 @@
     (via_costs 50)
     (plane_via_costs 5)
     (start_ripup_costs 100)
-    (start_pass_no 5031)
+    (start_pass_no 5179)
     (layer_rule F.Cu
       (active on)
       (preferred_direction horizontal)
@@ -70,19 +70,19 @@
   )
   (class "kicad_default"
     //O1 /SIN //O2 /SOUT /INTR /GPIO0 /GPIO7 /GPIO1
-    /GPIO6 /GPIO2 /GPIO5 /GPIO3 /GPIO4 "Net-(J7-Pad1)" //INT0 "//INT_IN"
-    //INT1 /MISO /SPICLK /MOSI "//INT_SPI" "//SS0_GPIO0" "//SS3_GPIO3" "//SS1_GPIO1"
-    "//SS2_GPIO2" /D0 /D1 "Net-(J10-Pad4)" /D2 "Net-(J10-Pad6)" /D3 "Net-(J10-Pad8)"
-    /D4 "Net-(J10-Pad10)" /D5 "/R_/W" /D6 "//SYS_RES" /D7 "Net-(J10-Pad16)"
-    /A0 "Net-(J10-Pad18)" /A1 "Net-(J10-Pad20)" /A2 /A3 /A4 "//R_W"
-    /A5 "Net-(J10-Pad28)" /A6 "Net-(J10-Pad30)" /A7 "Net-(J10-Pad32)" /A8 /A15
-    /A9 /A14 /A10 /A13 /A11 /A12 "Net-(J11-Pad3)" "Net-(J11-Pad4)"
-    "Net-(J12-Pad3)" "Net-(J12-Pad4)" "Net-(J13-Pad2)" "/SDA_MST1" "/SCL_MST1" "/SDA_MST0" "/SCL_MST0" "Net-(JP1-Pad1)"
-    /AD3 /AD2 /AD1 /AD0 "/SDA_SLAVE" "/SCL_SLAVE" "Net-(R5-Pad2)" /RST
-    //RESET "Net-(U3-Pad1)" /CLK "Net-(U4-Pad23)" "Net-(U4-Pad24)" "Net-(U4-Pad15)" "Net-(U4-Pad29)" "Net-(U4-Pad32)"
-    "Net-(U4-Pad33)" //UARTCE "Net-(U4-Pad17)" /TX "Net-(U5-Pad8)" /RX "Net-(U5-Pad9)" "Net-(U5-Pad4)"
-    "Net-(U5-Pad5)" "Net-(U6-Pad1)" "Net-(U6-Pad2)" "Net-(U6-Pad3)" "Net-(U6-Pad4)" "Net-(U7-Pad19)" "Net-(U12-Pad5)" "Net-(U13-Pad5)"
-    "Net-(U15-Pad4)"
+    /GPIO6 /GPIO2 /GPIO5 /GPIO3 /GPIO4 //INT0 "//INT_IN" //INT1
+    /MISO /SPICLK /MOSI "//INT_SPI" "//SS0_GPIO0" "//SS3_GPIO3" "//SS1_GPIO1" "//SS2_GPIO2"
+    /D0 /D1 "Net-(J10-Pad4)" /D2 "Net-(J10-Pad6)" /D3 "Net-(J10-Pad8)" /D4
+    "Net-(J10-Pad10)" /D5 "/R_/W" /D6 "//SYS_RES" /D7 "Net-(J10-Pad16)" /A0
+    "Net-(J10-Pad18)" /A1 "Net-(J10-Pad20)" /A2 /A3 /A4 "//R_W" /A5
+    "Net-(J10-Pad28)" /A6 "Net-(J10-Pad30)" /A7 "Net-(J10-Pad32)" /A8 /A15 /A9
+    /A14 /A10 /A13 /A11 /A12 "/SDA_MST1" "/SCL_MST1" "/SDA_MST0"
+    "/SCL_MST0" "/SDA_SLAVE" "/SCL_SLAVE" "Net-(R5-Pad2)" /RST //RESET "Net-(U3-Pad1)" /CLK
+    "Net-(U4-Pad23)" "Net-(U4-Pad24)" "Net-(U4-Pad15)" "Net-(U4-Pad29)" "Net-(U4-Pad32)" "Net-(U4-Pad33)" //UARTCE "Net-(U4-Pad17)"
+    /TX /RX "Net-(U7-Pad19)" "Net-(U15-Pad4)" "Net-(J10-Pad24)" "Net-(J15-Pad3)" /AB3 /AS2
+    /AB2 /AS1 /AB1 /AS0 /AB0 "Net-(U7-Pad15)" "Net-(U7-Pad16)" "Net-(U7-Pad17)"
+    "Net-(C7-Pad1)" "Net-(C7-Pad2)" "/SCL_SLAVE_5V" "/SDA_SLAVE_5V" "Net-(J13-Pad1)" "Net-(J13-Pad2)" "Net-(U9-Pad5)" "Net-(U9-Pad6)"
+    "Net-(U9-Pad8)"
     (clearance_class "kicad_default")
     (via_rule kicad_default)
     (rule
@@ -97,7 +97,7 @@
     (clearance_class Power)
     (via_rule Power)
     (rule
-      (width 500.0)
+      (width 600.0)
     )
     (circuit 
       (use_layer F.Cu B.Cu)

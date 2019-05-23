@@ -1,0 +1,52 @@
+                      * PC16550 TEST PROGRAM (1) 
+                      *
+B020                  UARTDA  EQU $B020               ;RBR/THR
+B021                  UARTIE  EQU $B021               ;IER
+B022                  UARTFC  EQU $B022               ;FCR
+B023                  UARTLC  EQU $B023               ;LCR
+B024                  UARTMC  EQU $B024               ;MCR
+B025                  UARTLS  EQU $B025               ;LSR
+B020                  UARTDL  EQU $B020               ;DLL
+B021                  UARTDM  EQU $B021               ;DLM
+                      *
+                      
+7800                          ORG $7800
+                      *
+7800  8603            INIT    LDA #3                  ;Turn Divisor latch Access Bit (DLAB) off
+7802  B7B023                  STA UARTLC
+7805  4F                      CLRA                    ;Disale interrupt 
+7806  B7B021                  STA UARTIE
+7809  8683                    LDA #$83                ;Turn DLAB on
+780B  B7B023                  STA UARTLC              ;Set baud rate to 9600
+780E  8630                    LDA #48                 ;7.3728 MHz /16 / 48 = 9600
+7810  B7B020                  STA UARTDL
+7813  4F                      CLRA
+7814  B7B021                  STA UARTDM
+7817  8603                    LDA #3                  ;Turn DLAB off again. 8-bit. none-party and 1 stop bit
+7819  B7B023                  STA UARTLC
+781C  8607                    LDA #$7                 ;Enable and clear RCVR/XMIT FIFO. Set RCVR FIFO Trigger level to 1
+781E  B7B022                  STA UARTFC
+                      *
+                      *       LDA #$0B                ;Enable /DTR, /RTS and /OUT2 (/OUT2 is forced to a logic 0, for debug)
+7821  4F                      CLRA                    ;Reset /DTR and /RTS
+7822  B7B024                  STA UARTMC              
+                      *
+7825  39                      RTS
+                      *
+7826  B6B025          UPUTCH  LDA UARTLS
+7829  B50020                  BITA %00100000
+782C  27F8                    BEQ UPUTCH
+782E  B67842                  LDA DATA
+7831  B7B020                  STA UARTDA
+7834  39                      RTS
+                      *
+7835  B6B025          UGETCH  LDA UARTLS
+7838  47                      ASRA
+7839  24FA                    BCC UGETCH
+783B  B6B020                  LDA UARTDA
+783E  B77842                  STA DATA
+7841  39                      RTS
+                      *
+7842                  DATA    RMB 1
+                      *
+                              END
