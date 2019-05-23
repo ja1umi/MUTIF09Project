@@ -8,7 +8,9 @@ MUTIF09 6809SBC sees this board as an additional asynchronous communication inte
 
 ## Block Diagram
 
-(You may need to install an extension, like *Markdown Preview Mermaid Support* to see this diagram correctly)
+(You may need to install an extension, like [*mermaid-for-github-chrome-extension*][1] (for Google Chrome) to see this diagram correctly)
+
+[1]:https://github.com/set0gut1/mermaid-for-github-chrome-extention
 
 ```mermaid
 graph TD
@@ -33,7 +35,7 @@ graph TD
 |UART-I2C (3.3 V, 5 V) bridge|works|SC18IM700, BSS138|
 |UART-SPI (3.3 V) bridge|works|SC18IM700, SC18IS602B|
 |GPIO (8 bit, 3.3 V)|works|SC18IM700|
-|I2C-bus master selection*|works|PCA9541|
+|I2C-bus master selection|works|PCA9541|
 |On-board RTC|works|DS3231 w/ backup battery|
 ||||
 
