@@ -20,7 +20,7 @@ FAQ
 
     As for assembly manual, you can download the document titled *"Technical memorandum on MUTIF09 6809 Single Board Computer"* for a fee below.
 
-    https://m-nihombashi.booth.pm/items/104543
+    https://m-nihombashi.booth.pm/
     
     Or, you can get a copy at *doujinshi* sales exhibitions (e.g. Comic Maket, TechBookFest).
     
