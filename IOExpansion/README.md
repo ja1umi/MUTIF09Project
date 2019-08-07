@@ -25,7 +25,7 @@ graph TD
   id6>External I2C Master] --- ADuM1250
   ADuM1250---|MST1|PCA9541
   SC18IM700 --- SCIS602B
-  SCIS602B --- id7[SPI slave port]
+  SC18IS602B --- id7[SPI slave port]
   SC18IM700 --- id8["GPIO port (8 bits)"]
 ```
 
@@ -57,4 +57,4 @@ graph TD
 
 ## Documentation
 
-This board has many features and therefore, I think that it needs documentation and examples. In spite of this, document preparation is still underway. For now, please refer to the IC datasheets.
+This board has many features and therefore, I think that it needs documentation and examples. In this regard, I wrote a booklet about this and it will be available on the 4th day (August 12) of Comic Market 96 (Ariake, Tokyo, Japan) at booth# 南ラ13b and at BOOTH ( https://m-nihombashi.booth.pm/ ) thereafter. For now, please refer to the corresponding datasheets.
