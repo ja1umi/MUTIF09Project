@@ -1,0 +1,40 @@
+                      * Processor check program
+                      *
+                      * Note 1: The 6309 enters in emulation mode (bit 0 of Reg-MD is 0) at reset
+                      *         for full compatibility with the 6809.
+                      * Note 2: All special 6309 instruction may be used even in the emulation mode.
+                      *
+0009                  ID6809  EQU $09
+0003                  ID6309  EQU $03
+                      *
+7800                          ORG $7800
+                      
+7800  6F8C29          START   CLR QUOT,PCR
+7803  6F8C27                  CLR REM,PCR
+7806  8D1B                    BSR CHK309
+7808  2713                    BEQ L6809
+780A  8603                    LDA #ID6309
+780C  A78C1C                  STA TYPE,PCR
+780F  CC3006                  LDD #$3006
+7812  118D60                  FCB $11, $8D, $60       ; 6309 DIVD #$60 instruction (divide by $60)
+7815  E78C14                  STB QUOT,PCR
+7818  A78C12                  STA REM,PCR
+781B  2005                    BRA EXIT
+781D  8609            L6809   LDA #ID6809
+781F  A78C09                  STA TYPE,PCR
+7822  39              EXIT    RTS
+                      *
+                      * Quoted from 'THE 6309 BOOK' written by Chris Burke
+                      * Determine whether processor is 6309 or 6809
+                      * Returns Z clear if 6309, set if 6809.
+                      *
+7823  3406            CHK309  PSHS D          ; Save Reg-D
+7825  1043                    FCB $10, $43    ; 6309 COMD instruction (COMA on 6809)
+7827  E161                    CMPB 1,S        ; not equal (i.e. Z == 0) if 6309
+7829  3586                    PULS D,PC       ; exit, restoring D
+                      *
+782B                  TYPE    RMB 1           ; processor type goes here ($09 if 6809, $03 if 6309)
+782C                  QUOT    RMB 1           ; quotient (should be $80 if 6309)
+782D                  REM     RMB 1           : reminder (should be $06 if 6309)
+                      
+                      
