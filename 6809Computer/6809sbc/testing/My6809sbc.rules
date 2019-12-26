@@ -1,0 +1,105 @@
+
+(rules PCB My6809sbc
+  (snap_angle 
+    fortyfive_degree
+  )
+  (autoroute_settings
+    (fanout off)
+    (autoroute on)
+    (postroute on)
+    (vias on)
+    (via_costs 50)
+    (plane_via_costs 5)
+    (start_ripup_costs 100)
+    (start_pass_no 22799)
+    (layer_rule F.Cu
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 2.4)
+    )
+    (layer_rule B.Cu
+      (active on)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.7)
+    )
+  )
+  (rule
+    (width 250.0)
+    (clear 200.2)
+    (clear 125.0 (type smd_to_turn_gap))
+    (clear 50.0 (type smd_smd))
+  )
+  (padstack "Via[0-1]_800:400_um"
+    (shape
+      (circle F.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-1]_800:400_um" "Via[0-1]_800:400_um" default
+  )
+  (via 
+    "Via[0-1]_800:400_um-kicad_default" "Via[0-1]_800:400_um" "kicad_default"
+  )
+  (via 
+    "Via[0-1]_800:400_um-Power" "Via[0-1]_800:400_um" Power
+  )
+  (via_rule
+    default "Via[0-1]_800:400_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-1]_800:400_um-kicad_default"
+  )
+  (via_rule
+    Power "Via[0-1]_800:400_um-Power"
+  )
+  (class default
+    (clearance_class default)
+    (via_rule default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    "Net-(C10-Pad1)" "Net-(C14-Pad1)" "/AUDIO_OUT" /PA0 /PA7 /PA1 /PA6 /PA2
+    /PA5 /PA3 /PA4 //RTS /RXD /TXD /PB0 /PB7
+    /PB1 /PB6 /PB2 /PB5 /PB3 /PB4 /PC0 /PC7
+    /PC1 /PC6 /PC2 /PC5 /PC3 /PC4 /OUT0 /OUT1
+    /E /D0 /D1 //NMI /D2 //IRQ /D3 //FIRQ
+    /D4 /D5 "/R_/W" /D6 //RESET /D7 //HALT /A0
+    /BS /A1 /BA /A2 /A3 /A4 /A5 /A6
+    /A7 /A8 /A15 /A9 /A14 /A10 /A13 /A11
+    /A12 "//BUFFER_FULL" "Net-(R8-Pad2)" "Net-(R10-Pad1)" /EXTAL /SCLK //PPICE //PITCE
+    //APUCE //ROMCE "Net-(U7-Pad15)" /Q /MRDY "Net-(C18-Pad1)" "Net-(C19-Pad1)" "Net-(C21-Pad1)"
+    "Net-(C22-Pad1)" "Net-(D1-Pad2)" "Net-(D2-Pad1)" "Net-(D2-Pad3)" "Net-(JP1-Pad2)" /RESET "Net-(JP2-Pad2)" //ACIACE
+    //RD //WR /IO //RAMCE //MUXCE /DOUT1 /POUT "Net-(R13-Pad2)"
+    "Net-(R14-Pad2)" /DOUT0 "Net-(U16-Pad2)"
+    (clearance_class "kicad_default")
+    (via_rule kicad_default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+  (class Power
+    /+5V /GND /+12V
+    (clearance_class Power)
+    (via_rule Power)
+    (rule
+      (width 700.0)
+    )
+    (circuit 
+      (use_layer F.Cu B.Cu)
+    )
+  )
+)

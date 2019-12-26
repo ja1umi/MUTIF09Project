@@ -1,0 +1,47 @@
+Name     ADDRESSDECODE-2;
+PartNo   16V8;
+Date     12/15/2019;
+Revision 02;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g16v8a;
+
+/* *************** INPUT PINS *********************/
+PIN 1	=	IO;		/* IO signal from ADDRESSDECODE-1 */
+PIN 2	=	A7;		/* Lower address [A7..A1] */
+PIN 3	=	A6;
+PIN 4	=	A5;
+PIN 5	=	A4;
+PIN 6	=	A3;
+PIN 7	=	A2;
+PIN 8   =   A1;
+PIN 9   =   WRB;
+PIN 11  =   RDB;
+/* PIN 17  =   DIN; */
+
+/* *************** OUTPUT PINS *********************/
+PIN 12	=	ACIACE;
+PIN 13	=	APUCE;
+PIN 14	=	PPICE;
+PIN 15	=   PITCE;
+PIN 16  =   MUXCE;
+PIN 17  =   DOUT0;
+PIN 18  =   DOUT1;
+
+/* ACIA 6850 chip enable, $B000 .. $B001 */
+ACIACE	=	!(IO & !A7 & !A6 & !A5 & !A4 & !A3 & !A2 & !A1); 
+/* APU Am9511 chip enable, $B004 .. $B005 */
+APUCE	=	!(IO & !A7 & !A6 & !A5 & !A4 & !A3 &  A2 & !A1);      
+/* PPI 8255A chip enable, $B010 .. $B013 */
+PPICE	=	!(IO & !A7 & !A6 & !A5 &  A4 & !A3 & !A2);
+/* PIT 8254 chip enable, $B014 .. $B017 */
+PITCE	=	!(IO & !A7 & !A6 & !A5 &  A4 & !A3 &  A2);
+
+/* Multiplexer enable, $B00A .. $B00B */
+MUXCE   =   !(IO & RDB & !A7 & !A6 & !A5 & !A4 & A3 & !A2 & A1);
+/* Digital Write-1, $B00C */
+DOUT0   =   IO & WRB & !A7 & !A6 & !A5 & !A4 & A3 & A2 & !A1;
+/* Digital Write-2, $B00E */
+DOUT1   =   !(IO & WRB & !A7 & !A6 & !A5 & !A4 & A3 & A2 & A1);

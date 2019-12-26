@@ -1,0 +1,74 @@
+Name     ADDRESSDECODE;
+PartNo   20V8;
+Date     11/5/2019;
+Revision 06;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g20v8a;
+
+/* *************** INPUT PINS *********************/
+PIN 1   =   A15;	/* system address a12 - A15 */
+PIN 2   =   A14;
+PIN 3   =   A13;
+PIN 4   =   A12;
+PIN 5	=	A11;
+PIN 6	=	A10;
+PIN 7	=	A9;
+PIN 8	=	A8;
+PIN 9	=	RWB;
+PIN 10	=	E;
+PIN 11	=	BUFFUL;
+PIN 13	=	RESB;
+
+FIELD ADDRESS = [A15..A8];                  
+
+/* *************** OUTPUT PINS *********************/
+PIN 15  =   IO;
+PIN 16  =   WR;
+PIN 17  =   RD;
+PIN 18  =   ROMCE;
+PIN 19  =   RAMCE;
+/*	PIN 15  =   RD;			*/
+/*	PIN 16  =   OE;			*/
+/*	PIN 17  =   PITCE;		*/
+/*	PIN 18  =   PPICE;		*/
+/*	PIN 19  =   ACIACE;		*/
+/*	PIN 20  =   APUCE;		*/
+/*	PIN 21  =   ROMCE;		*/
+/*	PIN 22  =   RAMWE;		*/
+PIN 22	=	RTS;
+PIN 21	=	RES;
+
+/* Intermediate Variable Definitions  */
+/* Memory-mapped I/O, $B000 .. $BFFF */
+IO  = ADDRESS:[BXXX .. BXXX];								
+
+/* Logic Equations go here*/
+WR  =   !(E & !RWB);
+RD  =   !(E &  RWB);
+
+/* On-board PROM enable: $C000 .. $FFFF */
+ROMCE   =   !( ADDRESS:[CXXX .. FXXX] );
+
+/* Output enable */
+/* OE      = !(RW & E); */
+/* OE  =   !( (RW & E & ADDRESS:[0XXX .. 7XXX]) # (RW & E & ADDRESS:[CXXX .. FXXX]) ); */
+
+/* On-board SRAM enable: $0000 .. $7FFF */
+RAMCE   =   !( ADDRESS:[0XXX .. 7XXX] );
+
+/* SRAM write enable */
+/* RAMWE   = !(!RW & E); */
+/* ACIA 6850 chip enable, $B000 .. $B001 */
+/* ACIACE  = !(IOEQN & !A7 & !A6 & !A5 & !A4 & !A3 & !A2 & !A1); */ 
+/* APU Am9511 chip enable, $B004 .. $B005 */
+/* APUCE   = !(IOEQN & !A7 & !A6 & !A5 & !A4 & !A3 &  A2 & !A1); */      
+/* PPI 8255A chip enable, $B010 .. $B013 */
+/* PPICE   = !(IOEQN & !A7 & !A6 & !A5 &  A4 & !A3 & !A2); */
+/* PIT 8254 chip enable, $B014 .. $B017 */
+/* PITCE   = !(IOEQN & !A7 & !A6 & !A5 &  A4 & !A3 &  A2); */
+
+RTS	=	!BUFFUL;
+RES	=	!RESB;
