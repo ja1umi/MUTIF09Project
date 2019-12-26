@@ -1,0 +1,50 @@
+Name     MEMEXPBANKSEL;
+PartNo   22V10;
+Date     7/22/2019;
+Revision 03;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g22v10;
+
+/* *************** INPUT PINS *********************/
+PIN 1	=	A15;        /* system address A15 - A8 */
+PIN 2	=	A14;
+PIN 3	=	A13;
+PIN 4	=	A12;
+PIN 5	=	BS6;        /* bank selection BS0 - BS6 */
+PIN 6	=	BS5;
+PIN 7	=	BS4;
+PIN 8	=	BS3;
+PIN 9	=	BS2;
+PIN 10	=	BS1;
+PIN 11	=	BS0;
+
+FIELD ADDRESS = [A15..A12];                  
+
+/* *************** OUTPUT PINS *********************/
+PIN 14  =	RAMA13;
+PIN 15  =	RAMA14;
+PIN 16  =	RAMA15;
+PIN 17  =	RAMA16;
+PIN 18	=	ROMA12;
+PIN 19	=	ROMA13;
+PIN 20	=	ROMA14;   
+PIN 21	=	RAMCE;
+PIN 22	=	ROMCE;
+
+/* Intermediate Variable Definitions  */
+RAMSEL	=	ADDRESS:[8XXX .. 9XXX];     /* A15 & !A14 & !A13; */
+ROMSEL	=	ADDRESS:[AXXX .. AXXX];     /* A15 & !A14 & A13 & !A12; */
+
+/* Logic Equations go here*/
+RAMCE	=	!RAMSEL;
+ROMCE	=	!ROMSEL;
+RAMA13	=	RAMSEL & BS0;
+RAMA14	=	RAMSEL & BS1;
+RAMA15	=	RAMSEL & BS2;
+RAMA16	=	RAMSEL & BS3;
+ROMA12	=	ROMSEL & BS4;
+ROMA13	=	ROMSEL & BS5;
+ROMA14	=	ROMSEL & BS6;

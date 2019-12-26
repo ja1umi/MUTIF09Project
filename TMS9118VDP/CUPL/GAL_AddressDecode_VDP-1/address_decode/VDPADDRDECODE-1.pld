@@ -1,0 +1,39 @@
+Name     VDPADDRDECODE;
+PartNo   22V10;
+Date     9/27/2019;
+Revision 05;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g22v10;
+
+/* *************** INPUT PINS *********************/
+PIN 1	=	A15;	/* Upper 8 bit system address [A15..A8] */
+PIN 2	=	A14;
+PIN 3	=	A13;
+PIN 4	=	A12;
+PIN 5	=	A11;
+PIN 6	=	A10;
+PIN 7	=	A9;
+PIN 8	=	A8;
+PIN 9	=	CAS;     
+PIN 10	=	RAS;
+
+/* FIELD ADDRESS = [A15..A8]; */                  
+
+/* *************** OUTPUT PINS *********************/
+/* PIN 14	=	IO;	*/
+PIN 23	=	IO;
+PIN 15	=	ROW;
+PIN 16	=	COL;   
+
+/* Memory-mapped I/O, $B000 .. $BFFF */
+/* TMS9118 VDP, $B008 .. $B008+1 */
+/* Logic Equation go here */
+/* IO	=	ADDRESS:[B0XX .. B0XX]; */
+IO  =   A15 & !A14 & A13 & A12 & !A11 & !A10 & !A9 & !A8;   /*  %1011_0000 */
+ROW =   !RAS;
+q0  =   !CAS;
+q1  =   !q0;
+COL =   !q1;

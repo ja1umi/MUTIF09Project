@@ -1,0 +1,553 @@
+                      * 63C09 Mandelbrot with output to TMS9918 video chip
+                      *
+                      * Fixed point Mandelbrot routine from https://rosettacode.org/wiki/Mandelbrot_set#Z80_Assembly
+                      *
+                      * Adapted to TMS9918 by J.B. Langston
+                      * Ported to HD63C09 by Kasumi YOSHINO
+                      
+                      *ramtop:         equ     $ffff
+                      *bdos:           equ     $0005
+                      
+7000                                  org     $7000
+                      *                ld      (oldstack),sp           ; save old stack pointer
+                      *                ld      sp, ramtop              ; initailize stack
+                      *               jp      mandelbrot
+7000  2012                            bra     mandelbrot
+                      *                include "tms.asm"               ; TMS subroutines
+                      
+                      * configuration parameters
+B008                  tmsram          equ $b008                       ; TMS9918A VRAM port
+B009                  tmsreg          equ $b009                       ; TMS9918A register port
+0040                  tmswritebit     equ $40                         ; bit to indicate memory write
+0080                  tmsregbit       equ $80                         ; bit to indicate register write
+0002                  tmswait         equ 2                           ; wait divisor
+                      
+                      * mandelbrot constants
+0100                  scale           equ     256                     ; Do NOT change this - the
+                                                                      ; arithmetic routines rely on
+                                                                      ; this scaling factor! :-)
+                      
+0400                  divergent       equ     scale * 4
+                      
+000E                  iteration_max   equ     14                      ; How many iterations
+FE00                  x_start         equ     -2 * scale              ; Minimum x-coordinate
+00FF                  x_end           equ     scale - 1               ; Maximum x-coordinate
+0003                  x_step          equ     3                       ; x-coordinate step-width
+FEE0                  y_start         equ     -9 * (scale / 8)        ; Minimum y-coordinate
+011F                  y_end           equ     9 * (scale / 8) - 1     ; Maximum y-coordinate
+0003                  y_step          equ     3                       ; y-coordinate step-width
+                      
+                      * mandelbrot variables
+                      *oldstack:        defw    0
+7002  0000            _x              fcb     0, 0                    ; x-coordinate
+7004  0000            _y              fcb     0, 0                    ; y-coordinate
+7006  0000            z_0             fcb     0, 0
+7008  0000            z_1             fcb     0, 0
+700A  0000            scratch_0       fcb     0, 0
+700C  0000            z_0_square_high fcb     0, 0
+700E  0000            z_0_square_low  fcb     0, 0
+7010  0000            z_1_square_high fcb     0, 0
+7012  0000            z_1_square_low  fcb     0, 0
+                      
+                      * mandelbrot entry point
+                      *mandelbrot:
+                      *               call    tmsbitmap
+                      *               xor     a                     ; clear pixel counters
+                      *               ld      (xypos), a
+                      *               ld      (xypos+1), a
+                      *               ld      (bitindex), a
+                      *               ld      hl, y_start             ; y = y_start
+                      *               ld      (y), hl
+7014                  mandelbrot
+7014  170141                          lbsr    initbitmap
+7017  7F70CE                          clr     xypos                   ; clear pixel counters
+701A  7F70CF                          clr     xypos+1
+701D  7F70CD                          clr     bitindex
+7020  CCFEE0                          ldd     #y_start                ; y = y_start
+7023  FD7004                          std     _y
+                      
+                      ; for (y = <initial_value> ; y <= y_end; y += y_step)
+                      ; {
+                      *outer_loop:     ld      hl, y_end               ; Is y <= y_end?
+                      *               ld      de, (y)
+                      *               and     a                       ; Clear carry
+                      *               sbc     hl, de                  ; Perform the comparison
+                      *               jp      m, mandel_end           ; End of outer loop reached
+                      
+7026  FC7004          outer_loop      ldd     _y
+7029  1083011F                        cmpd    #y_end
+702D  102E0098                        lbgt    mandel_end
+                      
+                      *    for (x = x_start; x <= x_end; x += x_step)
+                      *    {
+                      
+                      *               ld      hl, x_start             ; x = x_start
+                      *               ld      (x), hl
+                      *inner_loop:     ld      hl, x_end               ; Is x <= x_end?
+                      *               ld      de, (x)
+                      *               and     a
+                      *               sbc     hl, de
+                      *               jp      m, inner_loop_end       ; End of inner loop reached
+                      
+7031  CCFE00                          ldd     #x_start                ; x = x_start
+7034  FD7002                          std     _x
+7037  FC7002          inner_loop      ldd     _x
+703A  108300FF                        cmpd    #x_end                  ; is x <= x_end?
+703E  2E7D                            bgt     inner_loop_end
+                      
+                      *      z_0 = z_1 = 0;
+                      *               ld      hl, 0
+                      *               ld      (z_0), hl
+                      *               ld      (z_1), hl
+7040  CC0000                          ldd     #0
+7043  FD7006                          std     z_0
+7046  FD7008                          std     z_1
+                      
+                      *      for (iteration = iteration_max; iteration; iteration--)
+                      *      {
+                      
+                      *               ld      a, iteration_max
+                      *               ld      b, a
+7049  860E                            lda     #iteration_max
+                      
+                      *iteration_loop: push    bc                      ; iteration -> stack
+                      *        z2 = (z_0 * z_0 - z_1 * z_1) / SCALE;
+                      *               ld      de, (z_1)               ; Compute DE HL = z_1 * z_1
+                      *               ld      b, d
+                      *               ld      c, e
+                      *               call    mul_16
+                      *               ld      (z_0_square_low), hl    ; z_0 ** 2 is needed later again
+                      *               ld      (z_0_square_high), de
+                      *
+                      *               ld      de, (z_0)               ; Compute DE HL = z_0 * z_0
+                      *               ld      b, d
+                      *               ld      c, e
+                      *               call    mul_16
+                      *               ld      (z_1_square_low), hl    ; z_1 ** 2 will be also needed
+                      *               ld      (z_1_square_high), de
+                      *
+                      *               and     a                       ; Compute subtraction
+                      *               ld      bc, (z_0_square_low)
+                      *               sbc     hl, bc
+                      *               ld      (scratch_0), hl         ; Save lower 16 bit of result
+                      *               ld      h, d
+                      *               ld      l, e
+                      *               ld      bc, (z_0_square_high)
+                      *               sbc     hl, bc
+                      *               ld      bc, (scratch_0)         ; HL BC = z_0 ** 2 - z_1 ** 2
+                      *
+                      *               ld      c, b                    ; Divide by scale = 256
+                      *               ld      b, l                    ; Discard the rest
+                      *               push    bc                      ; We need BC later
+                      
+704B  3402            iteration_loop  pshs    a                       ; iteration counter -> stack
+                      *        z2 = (z_0 * z_0 - z_1 * z_1) / SCALE;
+704D  FC7008                          ldd     z_1
+7050  11BF7008                        muld    z_1
+7054  10FD7010                        stq     z_1_square_high
+                      
+7058  FC7006                          ldd     z_0
+705B  11BF7006                        muld    z_0
+705F  10FD700C                        stq     z_0_square_high
+                      
+7063  10B07012                        subw    z_1_square_low
+7067  10B27010                        sbcd    z_1_square_high
+706B  1FEF                            tfr     e, f                    ; Divide by scale (== 256)
+706D  1F9E                            tfr     b, e    
+706F  1038                            pshsw                           ; we need content of W register (i.e. z_2) later
+                      
+                      *        z3 = 2 * z0 * z1 / SCALE;
+                      *               ld      hl, (z_0)               ; Compute DE HL = 2 * z_0 * z_1
+                      *               add     hl, hl
+                      *               ld      d, h
+                      *               ld      e, l
+                      *               ld      bc, (z_1)
+                      *               call    mul_16
+                      *
+                      *               ld      b, e                    ; Divide by scale (= 256)
+                      *               ld      c, h                    ; BC contains now z_3
+                      *
+                      *        z3 = 2 * z0 * z1 / SCALE;
+7071  FC7006                          ldd     z_0
+7074  F37006                          addd    z_0
+7077  11BF7008                        muld    z_1
+707B  1FEF                            tfr     e, f                    ; divide by scale (== 256)
+707D  1F9E                            tfr     b, e                    ; W register now contains z_3
+                      *        z1 = z3 + y;
+                      *               ld      hl, (y)
+                      *               add     hl, bc
+                      *               ld      (z_1), hl
+                      
+                      *        z1 = z3 + y;
+707F  10BB7004                        addw    _y
+7083  10B77008                        stw     z_1
+                      
+                      *        z_0 = z_2 + x;
+                      *               pop     bc                      ; Here BC is needed again :-)
+                      *               ld      hl, (x)
+                      *               add     hl, bc
+                      *               ld      (z_0), hl
+                      
+                      *        z_0 = z_2 + x;
+7087  3506                            puls    d                       ; here z_2 is needed again
+7089  F37002                          addd    _x
+708C  FD7006                          std     z_0
+                      
+                      *        if (z0 * z0 / SCALE + z1 * z1 / SCALE > 4 * SCALE)
+                      *               ld      hl, (z_0_square_low)    ; Use the squares computed
+                      *               ld      de, (z_1_square_low)    ; above
+                      *               add     hl, de
+                      *               ld      b, h                  ; BC contains lower word of sum
+                      *               ld      c, l
+                      *
+                      *               ld      hl, (z_0_square_high)
+                      *               ld      de, (z_1_square_high)
+                      *               adc     hl, de
+                      *
+                      *               ld      h, l                    ; HL now contains (z_0 ** 2 +
+                      *               ld      l, b                    ; z_1 ** 2) / scale
+                      *
+                      *               ld      bc, divergent
+                      *               and     a
+                      *               sbc     hl, bc
+                      
+                      *        if (z0 * z0 / SCALE + z1 * z1 / SCALE > 4 * SCALE)
+                      *          break;
+708F  10FC700C                        ldq     z_0_square_high
+7093  10BB7012                        addw    z_1_square_low
+7097  10B97010                        adcd    z_1_square_high
+709B  1FEF                            tfr     e, f                    ; W register contains (z_0 ** 2 +
+709D  1F9E                            tfr     b, e                    ; z_1 ** 2) / scale
+709F  10810400                        cmpw    #divergent
+                      
+                      *               jp      c, iteration_dec        ; No break
+                      *               pop     bc                      ; Get latest iteration counter
+                      *               jr      iteration_end           ; Exit loop
+                      
+70A3  2304                            bls     iteration_dec
+70A5  3502                            puls    a                       ; Get the latest iteration counter
+70A7  2005                            bra     iteration_end
+                      
+                      *        iteration++;
+                      *iteration_dec:  pop     bc                      ; Get iteration counter
+                      *               djnz    iteration_loop          ; We might fall through!
+                      
+                      *        iteration++;
+70A9  3502            iteration_dec   puls    a                       ; Put iteration counter in A register
+70AB  4A                              deca
+70AC  269D                            bne     iteration_loop
+                      *      }
+                      *iteration_end:
+                      *      printf("%c", display[iteration % 7]);
+                      *               inc     b                       ; increment iteration count to get color
+                      *               call    drawpixel               ; plot it
+                      *
+                      *               ld      de, x_step              ; x += x_step
+                      *               ld      hl, (x)
+                      *               add     hl, de
+                      *               ld      (x), hl
+                      *
+                      *               jp      inner_loop
+                      
+70AE                  iteration_end
+70AE  4C                              inca                            ; increment iteration count to get color
+70AF  8D1F                            bsr     drawpixel               ; plot it
+70B1  FC7002                          ldd     _x                      ; x += x_step
+70B4  C30003                          addd    #x_step
+70B7  FD7002                          std     _x
+                      
+70BA  16FF7A                          lbra    inner_loop
+                      ;    }
+                      *    printf("\n");
+                      *inner_loop_end:
+                      *
+                      *               ld      de, y_step              ; y += y_step
+                      *               ld      hl, (y)
+                      *               add     hl, de
+                      *               ld      (y), hl                 ; Store new y-value
+                      *
+                      *               jp      outer_loop
+                      * }
+70BD                  inner_loop_end
+70BD  FC7004                          ldd     _y                      ; y += y_step
+70C0  C30003                          addd    #y_step
+70C3  FD7004                          std     _y                      ; store new y-value
+                      
+70C6  16FF5D                          lbra    outer_loop
+                      
+                      *mandel_end:
+                      *       ld      sp,(oldstack)                   ; put stack back to how we found it
+                      *       ;ld     c,$0                            ; this is the CP/M proper exit call
+                      *       ;jp     bdos
+                      *       halt
+                      
+                      ;mandel_end     leas 3, s
+70C9  39              mandel_end      rts
+                      
+                      *
+                      *   Compute DEHL = BC * DE (signed): This routine is not too clever but it
+                      * works. It is based on a standard 16-by-16 multiplication routine for unsigned
+                      * integers. At the beginning the sign of the result is determined based on the
+                      * signs of the operands which are negated if necessary. Then the unsigned
+                      * multiplication takes place, followed by negating the result if necessary.
+                      *
+                      *mul_16:         xor     a                       ; Clear carry and A (-> +)
+                      *               bit     7, b                    ; Is BC negative?
+                      *               jr      z, bc_positive          ; No
+                      *               sub     c                       ; A is still zero, complement
+                      *               ld      c, a
+                      *               ld      a, 0
+                      *               sbc     a, b
+                      *               ld      b, a
+                      *               scf                             ; Set carry (-> -)
+                      *bc_positive:    bit     7, D                    ; Is DE negative?
+                      *               jr      z, de_positive          ; No
+                      *               push    af                      ; Remember carry for later!
+                      *               xor     a
+                      *               sub     e
+                      *               ld      e, a
+                      *               ld      a, 0
+                      *               sbc     a, d
+                      *               ld      d, a
+                      *               pop     af                      ; Restore carry for complement
+                      *               ccf                             ; Complement Carry (-> +/-?)
+                      *de_positive:    push    af                      ; Remember state of carry
+                      *               and     a                       ; Start multiplication
+                      *               sbc     hl, hl
+                      *               ld      a, 16                   ; 16 rounds
+                      *mul_16_loop:    add     hl, hl
+                      *               rl      e
+                      *               rl      d
+                      *               jr      nc, mul_16_exit
+                      *               add     hl, bc
+                      *               jr      nc, mul_16_exit
+                      *               inc     de
+                      *mul_16_exit:    dec     a
+                      *               jr      nz, mul_16_loop
+                      *               pop     af                      ; Restore carry from beginning
+                      *               ret     nc                      ; No sign inversion necessary
+                      *               xor     a                       ; Complement DE HL
+                      *               sub     l
+                      *               ld      l, a
+                      *               ld      a, 0
+                      *               sbc     a, h
+                      *               ld      h, a
+                      *               ld      a, 0
+                      *               sbc     a, e
+                      *               ld      e, a
+                      *               ld      a, 0
+                      *               sbc     a, d
+                      *               ld      d, a
+                      *               ret
+                      
+                      * working area for 8 pixels at a time
+70CA  00              primary         fcb     0                       ; primary color
+70CB  00              secondary       fcb     0                       ; secondary color
+70CC  00              pattern         fcb     0                       ; color bit pattern
+70CD  00              bitindex        fcb     0                       ; current bit within byte
+70CE  00              xypos           fcb     0                       ; current y position on the screen
+70CF  00                              fcb     0                       ; current x position on the screen
+                      
+                      * plot a pixel to TMS9918 screen
+                      *       B = color of pixel
+                      *drawpixel:       
+                      *               ld      a, (bitindex)           ; check whether this is the first bit of a byte
+                      *               or      a
+                      *               ld      a, b                    ; load the current color in a
+                      *               jr      nz, comparecolor        ; for subsequent bits, proceed to comparison
+                      *               ld      (primary), a            ; for first bit, set both colors to current color
+                      *               ld      (secondary), a
+                      
+                      * plot a pixel to TMS9918 screen
+                      *       A = color of pixel
+70D0                  drawpixel
+70D0  7D70CD                          tst     bitindex                ; check whether this is the first bit of a byte
+70D3  2606                            bne     comparecolor            ; for subsequent bits, proceed to comparison
+70D5  B770CA                          sta     primary                 ; for first bit, set both colors to current color
+70D8  B770CB                          sta     secondary
+                      *comparecolor:        
+                      *               ld      hl, primary             ; compare the current color to primary color
+                      *               cp      (hl)
+                      *               scf              
+                      *               jr      z, setbit               ; if it's the same, set the pattern bit
+                      *               cp      1                       ; if it's different, is the current color black?
+                      *               jr      z, swapblack            ; if so, make it the primary color
+                      *               ld      (secondary), a          ; otherwise, set secondary color to current color
+                      *               or      a                       ; and clear the pattern bit
+                      *               jr      setbit
+                      
+70DB                  comparecolor
+70DB  B170CA                          cmpa    primary                 ; compare the current color to primary color
+70DE  2710                            beq     patbiton                ; if it's the same, set the pattern bit
+70E0  8101                            cmpa    #1                      ; if it's different, is the current color black?
+70E2  2705                            beq     swapblack               ; if so, make it the primary color
+70E4  B770CB                          sta     secondary               ; otherwise, set secondary color to current color
+70E7  200B                            bra     patbitoff               ; and clear the pattern bit
+                      
+                      *swapblack:
+                      *               ld      (primary), a            ; set the primary color to black
+                      *               xor     a                       ; clear all previous pattern bits
+                      *               ld      (pattern), a
+                      *               scf                             ; and set the current pattern bit
+                      
+70E9                  swapblack
+70E9  B770CA                          sta     primary                 ; set the primary color to black
+70EC  4F                              clra                            ; clear all previous pattern bit
+70ED  B770CC                          sta     pattern
+70F0  1A01            patbiton        orcc    #1                      ; and set the current pattern bit
+70F2  2002                            bra     setbit
+70F4  1CFE            patbitoff       andcc   #$fe                    ; clear the pattern bit
+                      
+                      *setbit:          
+                      *               ld      hl, pattern             ; pull the current pattern bit into the byte
+                      *               rl      (hl)
+                      *
+                      *               ld      a, (bitindex)           
+                      *               inc     a                       ; increment the bit index
+                      *               and     7                       ; mask it to a maximum of 7
+                      *               ld      (bitindex), a           ; save it back in memory
+                      *               ret     nz                      ; if this wasn't the last bit, we're done
+                      
+70F6                  setbit
+70F6  7970CC                          rol     pattern                 ; pull the current pattern bit into the byte
+70F9  7C70CD                          inc     bitindex                ; increment the bit index
+70FC  720770CD                        aim     #7, >bitindex           ; mask it to a max. of 7 and save it back
+7100  2701                            beq     1F
+7102  39                              rts
+                      
+                      *               ld      bc, (xypos)             ; calculate address for current x, y position
+                      *               ld      a, b                    ; d = (y / 8)
+                      *               rrca
+                      *               rrca
+                      *               rrca
+                      *               and     1fh
+                      *               ld      d, a
+                      *               ld      a, c                    ; e = (x & f8) + (y & 7)
+                      *               and     0f8h
+                      *               ld      e, a
+                      *               ld      a, b
+                      *               and     7
+                      *               or      e
+                      *               ld      e, a
+                      
+7103  B670CE          1               lda     xypos                   ; calculate address for current x, y position
+7106  47                              asra                            ; (y / 8)
+7107  47                              asra
+7108  47                              asra
+7109  841F                            anda    #$1f
+710B  3402                            pshs    a                       ; we need (y / 8) later
+710D  B670CE                          lda     xypos                   ; y
+7110  8407                            anda    #7
+7112  3402                            pshs    a
+7114  F670CF                          ldb     xypos+1                 ; x
+7117  C4F8                            andb    #$f8
+7119  EBE4                            addb    0, s                    ; B register contains (x & f8) + (y & 7)
+711B  3261                            leas    1, s
+711D  3502                            puls    a                       ; now A register contains (y / 8) again
+711F  1F02                            tfr     d, y
+                      
+                      *               call    tmswriteaddr            ; set write address within pattern table
+                      *               ld      a, (pattern)            ; send the pattern to TMS
+                      *               out     (tmsram), a
+                      
+7121  F7B009                          stb     tmsreg                  ; set write address within pattern table
+7124  843F                            anda    #$3f
+7126  8A40                            ora     #$40
+7128  B7B009                          sta     tmsreg
+712B  B670CC                          lda     pattern                 ; send the pattern to TMS
+712E  B7B008                          sta     tmsram
+                      
+                      *               ld      bc, 2000h               ; add the color table base address
+                      *               ex      de, hl
+                      *               add     hl, bc
+                      *               ex      de, hl
+                      *               call    tmswriteaddr            ; set write address within color table
+                      *               ld      a, (primary)            ; load primary color into upper 4 bits
+                      *               add     a, a
+                      *               add     a, a
+                      *               add     a, a
+                      *               add     a, a
+                      *               ld      hl, secondary           ; load secondary color into lower 4 bits
+                      *               or      (hl)
+                      *               out     (tmsram), a             ; send to TMS
+                      
+7131  31A92000                        leay    $2000, y                ; calculate the color table address
+7135  1F20                            tfr     y, d
+7137  F7B009                          stb     tmsreg                  ; set write address within color table
+713A  843F                            anda    #$3f
+713C  8A40                            ora     #$40
+713E  B7B009                          sta     tmsreg
+7141  B670CA                          lda     primary                 ; load primary color into upper 4 bits
+7144  48                              asla
+7145  48                              asla
+7146  48                              asla
+7147  48                              asla
+7148  BA70CB                          ora     secondary               ; load secondary color into lower 4 bits
+714B  B7B008                          sta     tmsram                  ; send to TMS
+                      
+                      *               ld      hl, (xypos)             ; increase next x/y position by 8 pixels
+                      *               ld      de, 8
+                      *               add     hl, de
+                      *               ld      (xypos), hl
+                      *               ret
+                      
+714E  FC70CE                          ldd     xypos                   ; increment next x/y position by 8 pixels
+7151  C30008                          addd    #8
+7154  FD70CE                          std     xypos
+7157  39                              rts
+                      *
+7158  4F              initbitmap      clra                            ; VRAM (incl. pattern table) starts at $0000
+7159  B7B009                          sta     tmsreg                  ; send address (lo)
+715C  8A40                            ora     #$40                    ; set the second highest bit to indicate write-op.
+715E  B7B009                          sta     tmsreg                  ; send address (high)
+                      
+7161  108E4000                        ldy     #$4000                  ; write 16KB
+7165  4F                              clra
+7166  B7B008          clrloop         sta     tmsram
+7169  1212121212                      rzb     11/tmswait, $12
+716E  313F                            leay    -1, y
+7170  26F4                            bne     clrloop                 ; continue until the counter is 0
+                      
+7172  4F                              clra                            ; name table starts at $3800
+7173  B7B009                          sta     tmsreg                  ; send lo address (lo = $00)
+7176  8638                            lda     #$38                    ; (high = $38)
+7178  8A40                            ora     #$40                    ; set the second highest bit to indicate write-op.
+717A  B7B009                          sta     tmsreg                  ; send hi address
+717D  8603                            lda     #3                      ; initialize name table with 3 sets
+717F  3402                            pshs    a                       ; of 256 bytes ranging from 00-FF
+7181  4F                              clra
+7182  B7B008          nameloop        sta     tmsram
+7185  12                              nop
+7186  12                              nop
+7187  4C                              inca
+7188  26F8                            bne     nameloop
+718A  6AE4                            dec     0, s
+718C  26F4                            bne     nameloop
+718E  3261                            leas    1, s
+                      
+7190  308C19                          leax    tmsbitmapreg, pcr
+7193  8608                            lda     #8                      ; 8 registers
+7195  3402                            pshs    a
+7197  A680            regloop         lda     , x+                    ; get the register value from the table
+7199  B7B009                          sta     tmsreg                  ; send it to the TMS
+719C  8608                            lda     #8
+719E  A0E4                            suba    0, s                    ; get the registger number
+71A0  8A80                            ora     #tmsregbit              ; set MSB to indicate 'register write operation'
+71A2  B7B009                          sta     tmsreg                  ; send it to the TMS
+71A5  6AE4                            dec     0, s
+71A7  26EE                            bne     regloop
+71A9  3261                            leas    1, s
+71AB  39                              rts
+                      *
+                      * register values for bitmapped graphics (graphics II mode)
+71AC                  tmsbitmapreg
+71AC  02                              fcb      %00000010               ; bitmap mode, no external video
+71AD  C2                              fcb      %11000010               ; 16KB ram; enable display
+71AE  0E                              fcb      $0e                     ; name table at $3800
+71AF  FF                              fcb      $ff                     ; color table at $2000
+71B0  03                              fcb      $03                     ; pattern table at $0
+71B1  76                              fcb      $76                     ; sprite attribute table at $3B00
+71B2  03                              fcb      $03                     ; sprite pattern table at $1800
+71B3  01                              fcb      $01                     ; black background
+                      *
+71B4                                  end

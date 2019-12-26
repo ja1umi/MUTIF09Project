@@ -1,0 +1,53 @@
+Name     MEMEXPADDRDECODE;
+PartNo   16V8;
+Date     7/24/2019;
+Revision 05;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g16v8a;
+
+/* *************** INPUT PINS *********************/
+PIN 1   =   A15;				/* system address A15 - A8 */
+PIN 2   =   A14;
+PIN 3   =   A13;
+PIN 4   =   A12;
+/* PIN 5   =   A11; */
+/* PIN 6   =   A10; */
+/* PIN 7   =   A9; */
+/* PIN 8   =   A8; */
+/* PIN 9   =   A7; */
+/* PIN 11  =   A6; */
+PIN 5   =   A7;					/* system address A0 - A7 */
+PIN 6   =   A6;
+PIN 7   =   A5;
+PIN 8   =   A4;
+PIN 9   =   A3;
+PIN 11  =   A2;
+PIN 12  =   A1;
+PIN 13  =   A0;
+PIN 14  =   RW;
+PIN 19  =   E;
+/* PIN 17  =   A0;  */
+
+FIELD ADDRESS = [A15..A12];                  
+
+/* *************** OUTPUT PINS *********************/
+PIN 16  =   OE;
+PIN 17  =   RAMWE;
+PIN 18  =   BANKSEL;   
+
+/* Intermediate Variable Definitions  */
+/* Memory-mapped I/O, $BX00 .. $BXFF  */
+/*IOEQN   = ADDRESS:[BXXX .. BXXX]; */			
+
+/* Logic Equations */
+/* Bank-switched SRAM write enable */
+RAMWE   = !(!RW & E & ADDRESS:[8XXX .. 9XXX]);
+
+/* Bank-switched SRAM/EPROM Output enable */
+OE      = !(RW & E & ADDRESS:[8XXX .. AXXX]);
+
+/* Address latch, 74HC273, $B006 */
+BANKSEL = !(!RW & E & ADDRESS:[BXXX .. BXXX] & !A7 & !A6 & !A5 & !A4 & !A3 & A2 & A1 & !A0);

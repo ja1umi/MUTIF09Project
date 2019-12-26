@@ -1,0 +1,104 @@
+                      * configuration parameters
+B008                  tmsram          equ $b008                       ; TMS9918A VRAM port
+B009                  tmsreg          equ $b009                       ; TMS9918A register port
+0040                  tmswritebit     equ $40                         ; bit to indicate memory write
+0080                  tmsregbit       equ $80                         ; bit to indicate register write
+0002                  tmswait         equ 2                           ; wait divisor
+                      *
+7000                                  org $7000
+                      
+7000  8D22            mcoltest        bsr initmulticolor
+                      
+7002  CC0070                          ldd     #112                    ; name table entry #112 (Row 12, Col 16)
+7005  58                              aslb                            ; get 1st byte (name table entry x 8) in the patter table
+7006  49                              rola
+7007  58                              aslb
+7008  49                              rola
+7009  58                              aslb
+700A  49                              rola
+                      
+700B  1F02                            tfr     d, y
+                      
+700D  F7B009                          stb     tmsreg
+7010  8A40                            ora     #tmswritebit
+7012  B7B009                          sta     tmsreg
+7015  8646                            lda     #$46                    ; put dark blue pixel and dark red pixel
+7017  B7B008                          sta     tmsram
+701A  12                              nop                             ; extra time to finish vram write (2 x nop)
+701B  12                              nop
+701C  86CF                            lda     #$cf                    ; put dark green pixel and white pixel 
+701E  B7B008                          sta     tmsram
+7021  12                              nop                             ; extra time to finish vram write (2 x nop)
+7022  12                              nop
+                      
+7023  39                              rts
+                      *
+7024  4F              initmulticolor  clra
+7025  B7B009                          sta     tmsreg                  ; send address (lo)
+7028  8A40                            ora     #tmswritebit            ; set the second highest bit to indicate write-op.
+702A  B7B009                          sta     tmsreg                  ; send address (high)
+                      
+702D  108E4000                        ldy     #$4000                  ; write 16KB
+7031  4F                              clra
+7032  B7B008          clrloop         sta     tmsram
+7035  1212121212                      rzb     11/tmswait, $12
+703A  313F                            leay    -1, y
+703C  26F4                            bne     clrloop                 ; continue until the counter is 0
+                      
+703E  4F                              clra                            ; set name table start address ($0800)
+703F  B7B009                          sta     tmsreg                  ; send lo address (lo = $00)
+7042  8608                            lda     #$08                    ; (high = $08)
+7044  8A40                            ora     #tmswritebit            ; set the second highest bit to indicate write-op.
+7046  B7B009                          sta     tmsreg                  ; send hi address
+                      
+7049  327D                            leas    -3, s
+704B  8606                            lda     #6
+704D  A762                            sta     2, s                    ; name table has 6 different sections
+704F  6F61                            clr     1, s                    ; first section starts at 0
+                      
+7051  8604            sectionloop     lda     #4
+7053  A7E4                            sta     0, s                    ; each section has 4 identical lines
+                      
+7055  A661            lineloop        lda     1, s                    ; load the section's starting value
+7057  C620                            ldb     #32                     ; each line is 32 bytes long
+7059  B7B008          byteloop        sta     tmsram                  ; output current name byte
+705C  12                              nop
+705D  12                              nop
+705E  4C                              inca                            ; increment name byte
+705F  5A                              decb                            ; decrement byte counter
+7060  26F7                            bne     byteloop                ; next byte
+7062  6AE4                            dec     0, s                    ; decrement line counter
+7064  26EF                            bne     lineloop                ; next line
+7066  A661                            lda     1, s                    ; section's starting value += 32
+7068  8B20                            adda    #32
+706A  A761                            sta     1, s
+706C  6A62                            dec     2, s                    ; decrement section counter
+706E  26E1                            bne     sectionloop             ; next section
+7070  3263                            leas    3, s
+                      
+7072  308C19          mcconfig        leax    tmsmcreg, pcr
+7075  8608                            lda     #8                      ; 8 registers
+7077  3402                            pshs    a
+7079  A680            regloop         lda     , x+                    ; get the register value from the table
+707B  B7B009                          sta     tmsreg                  ; send it to the TMS
+707E  8608                            lda     #8
+7080  A0E4                            suba    0, s                    ; get the registger number
+7082  8A80                            ora     #tmsregbit              ; set MSB to indicate 'register write operation'
+7084  B7B009                          sta     tmsreg                  ; send it to the TMS
+7087  6AE4                            dec     0, s
+7089  26EE                            bne     regloop
+708B  3261                            leas    1, s
+708D  39                              rts
+                      *
+                      * register values for multicolor mode
+708E                  tmsmcreg
+708E  00                              fcb     %00000000               ; external video disabled
+708F  C8                              fcb     %11001000               ; 16KB, display enabled, multicolor mode
+7090  02                              fcb     $02                     ; name table at $0800
+7091  00                              fcb     $00                     ; color table not used
+7092  00                              fcb     $00                     ; pattern table at $0000
+7093  76                              fcb     $76                     ; sprite attribute table at $3B00
+7094  03                              fcb     $03                     ; sprite pattern table at $1800
+7095  00                              fcb     $00                     ; black background
+                      *
+7096                                  end

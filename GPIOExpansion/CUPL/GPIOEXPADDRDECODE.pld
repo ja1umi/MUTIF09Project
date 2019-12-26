@@ -1,0 +1,42 @@
+Name     GPIOEXPADDRDECODE;
+PartNo   16V8;
+Date     7/23/2019;
+Revision 02;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g16v8a;
+
+/* *************** INPUT PINS *********************/
+PIN 1	=	A15;	/* system address A15 - A8 */
+PIN 2	=	A14;
+PIN 3	=	A13;
+PIN 4	=	A12;
+PIN 5	=	A11;
+PIN 6	=	A10;
+PIN 7	=	A9;
+PIN 8	=	A8;
+PIN 9	=	A7;
+PIN 11	=	A6;
+PIN 12	=	A5;
+PIN 13	=	A4;
+PIN 14	=	A3;
+PIN 19	=	A2;
+
+PIN 17	=	E;
+/* PIN 16  =   A1; */
+/* PIN 17  =   A0; */
+
+FIELD ADDRESS = [A15..A8];                  
+
+/* *************** OUTPUT PINS *********************/
+PIN 18 = DEMUXCE;
+
+/* Intermediate Variable Definitions  */
+/* Memory-mapped I/O, $B000 .. $BFFF */
+/* IOEQN =	ADDRESS:[BXXX .. BXXX]; */
+
+/* Logic Equation goes here*/
+/* 74HC(T)138 3 to 8 line decoder demultiplexer, $B018 .. $B01B */
+DEMUXCE = !(E & ADDRESS:[BXXX .. BXXX] & !A7 & !A6 & !A5 & A4 & A3 & !A2);	

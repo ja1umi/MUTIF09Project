@@ -1,0 +1,6 @@
+A000                          ORG $A000
+                      
+A000  20AA55FCFF      PAGE2_1 FCB $20, $AA, $55, $FC, $FF
+A005                  PAGE2_2 RMB $1000 - (PAGE2_2 - PAGE2_1)
+                      
+B000                          END

@@ -1,0 +1,42 @@
+Name     VDPADDRDECODE-2;
+PartNo   16V8;
+Date     10/10/2019;
+Revision 04;
+Designer Kasumi YOSHINO (JA1UMI);
+Company  Mercury-NIHOMBASHI;
+Assembly None ;
+Location  ;
+Device   g16v8a;
+
+/* *************** INPUT PINS *********************/
+PIN 1	=	IO;		/* IO signal from VDPADDRDECODE-1 */
+/* PIN 18	=	A7;		  Lower address [A7..A1] */
+PIN 2	=	A6;		/* Lower address [A6..A1] */
+PIN 3	=	A5;
+PIN 4	=	A4;
+PIN 5	=	A3;
+PIN 6	=	A2;
+PIN 7	=	A1;
+PIN 8	=	CLK_IN;
+PIN 14	=	RWB;
+PIN 11	=	E;
+PIN 18	=	RWB_SYS;
+/* *************** OUTPUT PINS *********************/
+PIN 17	=	CSRB;
+PIN 16	=	CSWB;
+PIN 19	=	WR;
+PIN 12	=	XTAL1_OUT;
+PIN 13	=	XTAL2_OUT;  
+
+/* Memory-mapped I/O, $B000 .. $BFFF */
+/* TMS9118 VDP, $B008 .. $B008+1 */
+/* Logic Equation go here */
+vdpsel	=	IO & !A6 & !A5 & !A4 & A3 & !A2 & !A1;
+CSRB	=	!(RWB_SYS  & E & vdpsel);	
+CSWB	=	!(!RWB_SYS & E & vdpsel);	
+WR	=	!RWB;
+/* RD  =   !WR; */
+q0	=	!CLK_IN;
+XTAL1_OUT	=	q0;
+XTAL2_OUT	=	!q0;
+

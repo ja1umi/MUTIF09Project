@@ -1,0 +1,95 @@
+                      * MEMCHK - 1Mbit EXTENDED MEMORY CHECK
+                      * Target: ASSIST09 on MUTIF09 6809SBC + 1Mbit SRAM (+ 256Kbit EEPROM)
+                      *
+                      * System definition
+B006                  banksel         equ     $B006
+A000                  startaddr       equ     $a000
+                      *
+                      * ASSIST09 services
+0001                  OUTCH           equ     1
+0006                  PCRLF           equ     6
+0004                  OUT2H           equ     4
+0005                  OUT4H           equ     5
+0003                  PDATA           equ     3
+0002                  PDATA1          equ     2
+0007                  SPACE           equ     7
+                      *
+7000                                  org $7000
+                      
+7000  308C50          start           leax    stmsg, pcr
+7003  3F                              swi
+7004  03                              fcb     PDATA
+7005  3F                              swi
+7006  06                              fcb     PCRLF
+                      
+                      * BANK MEM DUMP
+7007  327F                            leas    -1, s
+7009  8600                            lda     #0
+700B  A7E4            memloop         sta     0, s            ; stack(0) <- current bank number
+700D  308C71                          leax    bankm, pcr
+7010  3F                              swi
+7011  03                              fcb     PDATA
+                      
+7012  8624                            lda     #'$'
+7014  3F                              swi
+7015  01                              fcb     OUTCH
+                      
+7016  30E4                            leax    0, s
+7018  3F                              swi
+7019  04                              fcb     OUT2H
+701A  3F                              swi
+701B  06                              fcb     PCRLF
+                      
+701C  A6E4                            lda     0, s
+701E  48                              asla
+701F  48                              asla
+7020  48                              asla
+7021  48                              asla
+7022  B7B006                          sta     banksel
+7025  8D0C                            bsr     memdump
+                      
+7027  A6E4                            lda     0, s
+7029  4C                              inca
+702A  8108                            cmpa    #8              ; total of 8 banks
+702C  26DD                            bne     memloop
+702E  3261                            leas    1, s
+                      
+7030  3F                              swi
+7031  06                              fcb     PCRLF
+7032  39                              rts
+                      *
+7033  8EA000          memdump         ldx     #startaddr
+7036  3410                            pshs    x               ; stack(1) <- start address
+7038  8610                            lda     #16
+703A  3402                            pshs    a               ; stack(0) <- loop counter
+                      
+703C  8624                            lda     #'$'
+703E  3F                              swi
+703F  01                              fcb     OUTCH
+7040  3061                            leax    1, s
+7042  3F                              swi
+7043  05                              fcb     OUT4H
+                      ;               swi
+                      ;               fcb     SPACE
+                      
+7044  AE61                            ldx     1, s            ; start address
+7046  3F              loop            swi
+7047  04                              fcb     OUT2H
+                      ;               swi
+                      ;               fcb     SPACE
+7048  6AE4                            dec     0, s            ; first 16-byte dump finished?
+704A  2702                            beq     exit
+                      ;               leax    1, x
+704C  20F8                            bra     loop
+704E  3F              exit            swi
+704F  06                              fcb     PCRLF
+7050  3263                            leas    3, s
+7052  39                              rts
+                      *
+                      * Constants
+7053  2A2A2033326B2078203862697420454550524F4D204D454D44554D5020283173742031362D6279746529202A2A stmsg           fcc     /** 32k x 8bit EEPROM MEMDUMP (1st 16-byte) **/
+7080  04                              fcb     4
+7081  42414E4B3A      bankm           fcc     /BANK:/
+7086  04                              fcb     4
+                      *
+7087                                  end

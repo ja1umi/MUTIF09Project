@@ -1,0 +1,6 @@
+	ORG $A000
+
+PAGE1_1	FCB $10, $AA, $55, $FC, $FF
+PAGE1_2	RMB $1000 - (PAGE1_2 - PAGE1_1)
+
+	END
