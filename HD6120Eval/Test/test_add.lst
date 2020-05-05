@@ -1,0 +1,19 @@
+ASxxxx Assembler V05.31  (Intersil IM6100 / Harris HM6100)              Page 1
+Hexadecimal [16-Bits]                                 Mon May  4 00:49:08 2020
+
+
+
+                              1 	.area TEST (ABS)
+   0F80                       2 	.org 0o7600
+                              3 
+   0F80 0E C0         [20]    4 start:	cla cll
+   0F81 02 85         [20]    5 		tad	a
+   0F82 02 86         [20]    6 		tad	b
+   0F83 06 87         [22]    7 		dca	c
+   0F84 0A 84         [20]    8 loop:	jmp loop
+   0F85 00 02                 9 a:		.word	2
+   0F86 00 03                10 b:		.word	3
+   0F87 00 00                11 c:		.word	0
+                             12 
+   0FFF                      13 	.org 0o7777
+   0FFF 0A 80         [20]   14 reset:	jmp start
