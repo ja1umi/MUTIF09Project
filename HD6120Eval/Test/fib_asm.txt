@@ -1,0 +1,73 @@
+//
+// HD-1-6120 Code goes here
+//
+//                        *10                 / Set current assembly origin to address 010.
+  MA[00010] = 0;          // SPTR, 0          / An auto-increment regiser (one of eight at 010-017)
+
+//                        FIELD 0
+//                        *0177               / Set current assembly origin to program area
+  MA[00177] = 00200;      //                  / Program start address 
+
+//                        *0200               / Set current assembly origin to program area
+  MA[00200] = 07200;      // STRT, CLA        /
+  MA[00201] = 01262;      // TAD (STK1)       / Initialize SP1 
+  MA[00202] = 06217;      // LSP1             /  (SP1 = 07577)
+  MA[00203] = 01263;      // TAD (STK2)       / Initialize SP2 
+  MA[00204] = 06237;      // LSP2             /  (SP2 = 07776)
+  MA[00205] = 07200;      // CLA              / 
+
+  MA[00206] = 01261;      // LOOP, TAD (10)   / Push constant of 10
+  MA[00207] = 06255;      // PAC2             /  onto Stack 2
+  MA[00210] = 06205;      // PPC1             / Jump to subroutine to
+  MA[00211] = 05215;      // JMP FIB          /  calculate Fibonacci number of a given integer on Top of Stack 2 (TOS)
+  MA[00212] = 06275;      // POP2             / Retrieve the result from TOS
+  MA[00213] = 06246;      // WSR              /  and write to the external device
+  MA[00214] = 05206;      // JMP LOOP         / Repeat forever 
+
+  MA[00215] = 06227;      // FIB, RSP2        / This subroutine assumes that the parameter is on Stack 2
+  MA[00216] = 03010;      // DCA Z SPTR       / SPTR = SP2
+  MA[00217] = 01410;      // TAD I Z SPTR     / AC = (+SP2)  Note: AC contains n
+  MA[00220] = 07440;      // SZA              / If n == 0
+  MA[00221] = 05223;      // JMP NOT0         / 
+  MA[00222] = 06225;      // RTN1             /  Then, just return because Fib(0) == n == 0. 
+  
+  MA[00223] = 06227;      // NOT0, RSP2       / SPTR = SP2
+  MA[00224] = 03010;      // DCA Z SPTR       / 
+  MA[00225] = 01410;      // TAD I Z SPTR     / AC = (+SP2)  Note: AC contains n
+  MA[00226] = 01257;      // TAD (-1)         / If n == 1
+  MA[00227] = 07440;      // SZA              / 
+  MA[00230] = 05232;      // JMP NOT1         / 
+  MA[00231] = 06225;      // RTN1             / Then, just return because Fib(1) == n == 1
+  
+  MA[00232] = 06275;      // NOT1, POP2       / AC = TOS, which contains n
+  MA[00233] = 06215;      // PAC1             / Save AC
+  MA[00234] = 01257;      // TAD (-1)         / Push (AC - 1) 
+  MA[00235] = 06255;      // PAC2             /  onto Stack 2
+  MA[00236] = 06205;      // PPC1             / Calculate Fib(n-1)
+  MA[00237] = 05215;      // JMP FIB          /  by recursive call
+  MA[00240] = 06235;      // POP1             / Retrieve AC, which contains n
+  MA[00241] = 01260;      // TAD (-2)         / Push (AC - 2)
+  MA[00242] = 06255;      // PAC2             /  onto Stack 2
+  MA[00243] = 06205;      // PPC1             / Calculate Fib(n-2)
+  MA[00244] = 05215;      // JMP FIB          / 
+  MA[00245] = 06227;      // RSP2             / SPTR = SP2
+  MA[00246] = 03010;      // DCA Z SPTR       / 
+  MA[00247] = 01410;      // TAD I Z SPTR     / AC = Fib(n-2)
+  MA[00250] = 01410;      // TAD I Z SPTR     / AC += Fib(n-1)
+  MA[00251] = 06215;      // PAC1             / Save AC, which contains Fib(n). Note: Fib(n) == Fib(n-2) + Fib(n-1)
+  MA[00252] = 06275;      // POP2             / Adjust SP2
+  MA[00253] = 06275;      // POP2             / 
+  MA[00254] = 06235;      // POP1             / Retrieve AC, which contains Fib(n) 
+  MA[00255] = 06255;      // PAC2             / Push AC onto Stack 2  
+  MA[00256] = 06225;      // RTN1             / 
+
+  MA[00257] = 07777;      //                  / -1 
+  MA[00260] = 07776;      //                  / -2 
+  MA[00261] = 10;         //                  / 10 
+  MA[00262] = 07577;      // STK1             / SP1 top  
+  MA[00263] = 07776;      // STK2             / SP2 top  
+  MA[00264] = 0;          // ANS, 0           / Holds Fibonacci number of a given integer
+
+// HD-1-6120 Reset vector
+//                        *7777               / 
+  MA[07777] = 05577;      // JMP I Z 0177
