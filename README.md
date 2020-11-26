@@ -24,3 +24,4 @@ FAQ
     
     Or, you can get a copy at *doujinshi* sales exhibitions (e.g. Comic Maket, TechBookFest, Micom-Infinite PRO-68K).
     
+    **I encourage you to get your copy of the booklet at online store ( https://m-nihombashi.booth.pm/ ) due to the COVID-19 situation.**
