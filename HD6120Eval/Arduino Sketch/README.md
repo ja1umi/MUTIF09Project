@@ -9,7 +9,7 @@ This strategy needs many interrupt pins but fortunately Arduino Mega 2560 can af
 
 HD-6120 has a 12-bit address space (to be precise, HD-6120 has yet another 3 extended memory address bits, so HD-6120 can have 8 banks (*fields* in PDP-8 terminology) of memory (4 kilo words per *field*) but leave it for now). This means that HD-6120 can have up to 4 kilo word of memory.
 
-One (1) word consists of 12-bit data. So, one word occupies 2 bytes. 4 kilo x 2 bytes = 8 kilo bytes (kB) is necessary for full memory population.  
+One (1) word consists of 12-bit data. So, one word occupies 2 bytes. 4 kilo x 2 bytes = 8 kilo bytes (kB) are necessary for full memory population.  
 
 Memory for HD-6120 is implemented as an array in SRAM in Arduino Mega 2560. It is true that Arduino Mega 2560 has a 8 kB of SRAM but Arduino SRAM is used for other than the array (e.g. global variables). Thus, whole array cannot be allocated. Furthermore, HD-6120 expects that memory is writable. 
  
