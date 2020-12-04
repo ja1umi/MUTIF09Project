@@ -1,26 +1,38 @@
 # Some notes on the hardware
 
-**1. Demultiplexing**
+**1. Demultiplexing (address visualization)**
 
-For demultiplexing the address signals from the bus (DX0..Dx11), two octal D-FF (74HC574) is used to grab the address (main mamory).
+To examine whether the address is demultiplexed from the bus (DX0..DX11) visually, two octal D-FFs (74HC574) and LEDs are used. As shown in the schematic, the D inputs and Q outputs are connected to the bus and LEDs, respectively. The L̅X̅M̅A̅R̅ signal is fed to the CP input through a spare NOT gate. 
 
-I added several LEDs to observe HD-6120's control signals (e.g. L̅X̅M̅A̅R̅) and inverter (74HC04) for LED driving. So, inverted signal are fed to clock pin (pin 11) of 74HC574. 
+I could use transparent latch (74HC573), instead of 74HC574. In this case, The L̅X̅M̅A̅R̅ signal can be directly connected to the LE input of 74HC573.
 
-I could use transparent latch (74HC573), instead of 74HC574, without LEDs to make things simple but I believe that signal visualization is useful for debug and understanding the behaviour of CPU.
+In fact, demultiplexing is only for address *"visualization"* purpose only. The address value is grabbed at the falling edge of the L̅X̅M̅A̅R̅ (for main memory) and L̅X̅P̅A̅R̅ (for panel memory) from the bus in the sketch.
 
-**2. Handling of C0/C̅0̅ and C1/C̅1̅ (HD-6120's pin 25 and pin 26)**
+**2. Bus transaction**
+
+The bus (DX0..DX11) is bidirectional. Arduino Mega 2560 reads data from the bus and store them onto SRAM. Conversely, Mega 2560 also read data from its SRAM and writes to the bus.  
+
+Whereas, my sketch uses dedicated pins for input (reading data from the bus) and/or output (writing data to the bus). These pins are unidirectional. This makes, in my belief, the sketch easy to read und understand. But the caution is required.
+
+Please suppose that output pins are connected directly to the bus and HD-6120 tries to write data into the bus. In this assumption, both (Arduino and HD-6120) try to write data to the bus at the same time. If an Arduino pin is HIGH and the corresponding HD-6120 pin is LOW, a large current flows and it can damage the device(s). This should not be happened.
+
+To avoid this disaster, output pins at Arduino side should be isolated as needed. For this purpose, two (2) octal bus tranceivers with tri-state outputs (74HC245) are used; one for higher 8 bits and anoher one for lower 4 bits. These octal bus transceivers are sit in between Arduino output pins and HD-6120 and R̅E̅A̅D̅ signal is connected to O̅E̅ pin of 74HC245. If HD-6120 tries to write data to the bus, R̅E̅A̅D̅ signal remains HIGH. So, output from Arduino is disabled as O̅E̅ is deasserted (remebmer this; O̅E̅ is active low). In contrast, if HD-6120 tries to read data from the bus, R̅E̅A̅D̅ signal goes low and output from Arduino is enabled as O̅E̅ is asserted.
+
+Though Arduino input pins are directly connected to the bus, they do not affect the bus, as they are configured as input without pull-up and therefore, they are always in high-impedance state.
+
+**3. Handling of C0/C̅0̅ and C1/C̅1̅ (HD-6120's pin 25 and pin 26)**
    
-These are multiplexed, bidirectional pins. They are active high ouput, extended memory address (EMA) bit 0..1 and active low input peripheral device control line during an I/O transfer. I decided to use dedicated Arduino Mega 2560's GPIO pins for input and output to make my life easier; Mega 2560's pin D39..D41 pins are assigned for reading EMA bits and pin D67..D68 for peripheral device control (see also my sketch for more details).
+These are multiplexed, bidirectional pins. They are active high ouput, extended memory address (EMA) bit 0..1 and active low input, peripheral device control line during an I/O transfer. I decided to use dedicated Arduino Mega 2560's GPIO pins for input and output to make my life easier; Arduino Mega 2560 pin D39..D41 pins are assigned for reading EMA bits and pin D67..D68 for peripheral device control (see also my sketch for more details).
 
 For demultiplexing purpose, I inserted a diode between C0/C̅0̅ -- D67 (and also between C1/C̅1̅ -- D68) and added pull-up resistors connected to +5V power rail. This make C0/C̅0̅ and C1/C̅1̅ pins *"open drain"* . Needless to say, D67 and D68 are configured as output mode. Using open-drain buffer, such as 74HC07, might be better but combination of diode and pull-up resistor works fine for me.
 
-**3. Clock generator**
+**4. Clock generator**
 
 As shown in the schematic, astable configured 555 timer is used for clock generation.
 
 HD-6120 can operate at frequency up to 5.1 MHz. However, actual operation clock frequency is limited by the I/O performance and in my design (treating an Arduino Mega 2560 as memory with peripheral device) it is not good enough. The values shown in the schematic are for around 80 kHz of clock (R8 = 56k ohm, C7 = 120 pF). I did my best to improve the performance but it was the "best possible" result at this moment.
 
-**4. Single step (instruction) execution**
+**5. Single step (instruction) execution**
 
 This functionality is achieved by providing one shot of clock pulse to HD-6120. This is implemented by monostable configured 555 timer. The pulse is triggered by the tacticle switch debounced by SR-FF configured 555.
 
@@ -31,7 +43,7 @@ Debouncing circuit by 555 is designed by GATARO. https://t.co/HSp6OM8IeJ
 
 That is really a great, cool design!
 
-**5. Additional circuitry in testing (not shown in the schematic)**
+**6. Additional circuitry in testing (not shown in the schematic)**
 
 Five (5) 74HC595 (a serial-in, parallel-out shift register with output latches) in series are connected to the Arduino Mega 2560 to drive 7-segment LEDs for handy output. 74HC595s/LEDs are accessed via WSR instruction of HD-6120. See also *"Some notes on software"* for more details. 
 
@@ -53,26 +65,26 @@ Even though Arduino Mega 2560 is easy-to-use, reasobably fast and it has plenty 
 
 Another caveat is that Arduino Mega 2560 has *only* 8 kB of SRAM. I know that there is plenty enough room, at least compared with popular Arduino Uno, for most of purposes. 
 
-However, this is not true for this project. HD-6120's memory is implemented as an array on Arduino's SRAM. Please rememer that HD-6120 has a 15-bit address space in total, arranged in to 4 k words x 8 *fields* for both main- and panel memory. HD-6120's one (1) word consists of 12 bits and therefore it occupies 2 bytes (uint16_t type). Taken together, maximum of 128 kB (32 x 2 k words) of SRAM is required!
+However, this is not true for this project. HD-6120's memory is implemented as an array on Arduino's SRAM. Please rememer that HD-6120 has a 15-bit (12 bits + 3 bits for EMA) address space in total, arranged in to 4 k words x 8 *fields* for both main- and panel memory. HD-6120's one (1) word consists of 12 bits and therefore it occupies 2 bytes (uint16_t type). Taken together, maximum of 128 kB (32 x 2 k words) of SRAM is required!
 
-The above mentioned issues is very likely to resolved by use of a more powerful microcontroller board insted of Arduino Mega 2560. Arduino Due and Nucleo-F767ZI seem good. The followings are pros and cons;
+The above mentioned issues is very likely to resolved by use of a more faster microcontroller board insted of Arduino Mega 2560. Arduino Due and Nucleo-F767ZI seem good. The followings are pros and cons;
 
     Arduino Due
     Pros: 
         (1) more memory is available (64 kB + 32 kB SRAM),
         (2) the same Arduino IDE can be used.
     Cons:
-        (1) less poweful than Nucleo-F767ZI
-        (2) Software has to be re-written or at least, modified.
+        (1) faster than Mega 2560 but slower than Nucleo-F767ZI
+        (2) software has to be re-written or at least, modified.
         (3) level shifting (5V -> 3.3V) circuitry is necessary.
 
     Nucleo-F767ZI
     Pros: 
         (1) much more memory is available (512 kB SRAM)
-        (2) more powerful than Arduino Due
+        (2) faster than Arduino Due
         (3) 5V-tolerant pins are available. No level shifter (5V -> 3.3V) may be necessary.
     Cons:
         (1) software has to be re-written.
-        (2) less popular and availability (?)
+        (2) less popularity and less availability (?)
 
-It is worth to gather information about Teensy.
+I think that it is a time to gather information about Teensy.
