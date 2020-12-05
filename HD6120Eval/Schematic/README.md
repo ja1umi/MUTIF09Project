@@ -14,6 +14,10 @@ The bus (DX0..DX11) is bidirectional. Arduino Mega 2560 reads data from the bus 
 
 Whereas, my sketch uses dedicated pins for input (reading data from the bus) and/or output (writing data to the bus). These pins are unidirectional. This makes, in my belief, the sketch easy to read und understand. But the caution is required.
 
+| GPIO pin configured as an input (HD-6120->Arduino) | GPIO pin condigured as an output (Arduino -> HD-6120) |
+| :---: | :---: |
+| DP30, DP31, DP32, DP33, DP29, DP28, DP27, DP26, DP25, DP24, DP23, and DP22 | DP34, DP35, DP36, DP37, DP42, DP43, DP44, DP45, DP46, DP47, DP48, and DP49 |
+
 Please suppose that output pins are connected directly to the bus and HD-6120 tries to write data into the bus. In this assumption, both (Arduino and HD-6120) try to write data to the bus at the same time. If an Arduino pin is HIGH and the corresponding HD-6120 pin is LOW, a large current flows and it can damage the device(s). This should not be happened.
 
 To avoid this disaster, output pins at Arduino side should be isolated as needed. For this purpose, two (2) octal bus tranceivers with tri-state outputs (74HC245) are used; one for higher 8 bits and anoher one for lower 4 bits. These octal bus transceivers are sit in between Arduino output pins and HD-6120 and R̅E̅A̅D̅ signal is connected to O̅E̅ pin of 74HC245. If HD-6120 tries to write data to the bus, R̅E̅A̅D̅ signal remains HIGH. So, output from Arduino is disabled as O̅E̅ is deasserted (remebmer this; O̅E̅ is active low). In contrast, if HD-6120 tries to read data from the bus, R̅E̅A̅D̅ signal goes low and output from Arduino is enabled as O̅E̅ is asserted.

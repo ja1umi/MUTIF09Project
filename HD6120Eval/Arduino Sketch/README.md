@@ -18,9 +18,24 @@ After consideration, I decided not to make it emulate all memory. Only lower 10 
 
 | address area in hex | address area in octal |
 | :---: | :---: |
-| 0000-03ff | 0000-1777 |
+| 0000-03ff | 0000-1777 (user area) |
 | 0400-07ff | 2000-3777 (echo) |
 | 0800-0bff | 4000-5777 (echo) |
 | 0c00-0fff | 6000-7777 (echo) |
 
 Similarly, panel memory is also implemented. 
+
+In the early stage of development, associative array-based sparse arrays are used for implementing main- and panel memory. 
+
+My idea was the following: one of my goals is to experience the essence of programming of various microprocessors. So, program size would be small. If this is the case, most part of the memory is unused. So, storing pairs of address and data seems to be sufficient. This can signigicantly reduce memory usage. 
+
+After *Googling*, I found ArduinoSTL library, which includes map class as an associative array and access data stored in a map with iterators. Yes, *MaaM*! (I mean, Memory as a Map object). It works well while processor speed is slow enough; less than 2~3 kHz. Map object (assosiative array) is expensive. I switched from using assosiative array to simple array in SRAM.
+
+**3. Port manipulation**
+
+To improve I/O performance, I tried 2 options: (1) substituting DigitalWrite/DigitalRead with DigitalWrite2/DigitalRread2, as used in *RetroShield* software (for Arduino Mega), (2) substituting DigitalWrite/DigitalRead with direct port manipulation by accessing port registers. Finally, (2) was used for bus-handling and (1) was used for handling other control signals.
+
+
+
+
+
