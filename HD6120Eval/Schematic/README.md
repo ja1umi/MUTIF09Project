@@ -14,10 +14,6 @@ The bus (DX0..DX11) is bidirectional. Arduino Mega 2560 reads data from the bus 
 
 Whereas, my sketch uses dedicated pins for input (reading data from the bus) and/or output (writing data to the bus). These pins are unidirectional. This makes, in my belief, the sketch easy to read und understand. But the caution is required.
 
-| GPIO pin configured as an input (HD-6120->Arduino) | GPIO pin condigured as an output (Arduino -> HD-6120) |
-| :---: | :---: |
-| DP30, DP31, DP32, DP33, DP29, DP28, DP27, DP26, DP25, DP24, DP23, and DP22 | DP34, DP35, DP36, DP37, DP42, DP43, DP44, DP45, DP46, DP47, DP48, and DP49 |
-
 Please suppose that output pins are connected directly to the bus and HD-6120 tries to write data into the bus. In this assumption, both (Arduino and HD-6120) try to write data to the bus at the same time. If an Arduino pin is HIGH and the corresponding HD-6120 pin is LOW, a large current flows and it can damage the device(s). This should not be happened.
 
 To avoid this disaster, output pins at Arduino side should be isolated as needed. For this purpose, two (2) octal bus tranceivers with tri-state outputs (74HC245) are used; one for higher 8 bits and anoher one for lower 4 bits. These octal bus transceivers are sit in between Arduino output pins and HD-6120 and R̅E̅A̅D̅ signal is connected to O̅E̅ pin of 74HC245. If HD-6120 tries to write data to the bus, R̅E̅A̅D̅ signal remains HIGH. So, output from Arduino is disabled as O̅E̅ is deasserted (remebmer this; O̅E̅ is active low). In contrast, if HD-6120 tries to read data from the bus, R̅E̅A̅D̅ signal goes low and output from Arduino is enabled as O̅E̅ is asserted.
@@ -34,7 +30,7 @@ For demultiplexing purpose, I inserted a diode between C0/C̅0̅ -- D67 (and als
 
 As shown in the schematic, astable configured 555 timer is used for clock generation.
 
-HD-6120 can operate at frequency up to 5.1 MHz. However, actual operation clock frequency is limited by the I/O performance and in my design (treating an Arduino Mega 2560 as memory with peripheral device) it is not good enough. The values shown in the schematic are for around 80 kHz of clock (R8 = 56k ohm, C7 = 120 pF). I did my best to improve the performance but it was the "best possible" result at this moment.
+HD-6120 can operate at frequency up to 5.1 MHz. However, actual operation clock frequency is limited by the I/O performance and in my design (treating an Arduino Mega 2560 as memory with peripheral device) it is not good enough. The values shown in the schematic are for around 80 kHz of clock (actual meatured value where R8 = 56 kohm and  C7 = 120 pF). I did my best to improve the performance but it was the "best possible" result at this moment (R8 = 60 kohm is better for stability).
 
 **5. Single step (instruction) execution**
 
@@ -63,32 +59,35 @@ Besides, two (2) CD4021B (a paralel-in, serial-out shift register) in series are
 
 https://www.arduino.cc/en/Tutorial/Foundations/ShiftIn
 
-**6. What's next? / Speed and memory**
+**6. Other microcontroller board**
 
 Even though Arduino Mega 2560 is easy-to-use, reasobably fast and it has plenty of GPIO pins, as I/O between Arduino and HD-6120 is controlled by software, the clock speed of Arduino Mega 2560 is a rate-limiting factor. 
 
-Another caveat is that Arduino Mega 2560 has *only* 8 kB of SRAM. I know that there is plenty enough room, at least compared with popular Arduino Uno, for most of purposes. 
+Another caveat is that Arduino Mega 2560 has *only* 8 kB of SRAM. I know that there is plenty enough room, at least compared with popular Arduino Uno, for most of purposes. However, this is not true for this project. 
 
-However, this is not true for this project. HD-6120's memory is implemented as an array on Arduino's SRAM. Please rememer that HD-6120 has a 15-bit (12 bits + 3 bits for EMA) address space in total, arranged in to 4 k words x 8 *fields* for both main- and panel memory. HD-6120's one (1) word consists of 12 bits and therefore it occupies 2 bytes (uint16_t type). Taken together, maximum of 128 kB (32 x 2 k words) of SRAM is required!
+    HD-6120's memory is implemented as an array on Arduino's SRAM. Please rememer that HD-6120 has a 15-bit (12 bits + 3 bits for EMA) address space in total, arranged in to 4 k words x 8 fields for both main- and panel memory. HD-6120's one (1) word consists of 12 bits and therefore it occupies 2 bytes (uint16_t type). Taken together, maximum of 128 kB (32 k words for main memory and 32 k words for panel memory) of SRAM is required!
 
 The above mentioned issues is very likely to resolved by use of a more faster microcontroller board insted of Arduino Mega 2560. Arduino Due and Nucleo-F767ZI seem good. The followings are pros and cons;
 
-    Arduino Due
-    Pros: 
-        (1) more memory is available (64 kB + 32 kB SRAM),
-        (2) the same Arduino IDE can be used.
-    Cons:
-        (1) faster than Mega 2560 but slower than Nucleo-F767ZI
-        (2) software has to be re-written or at least, modified.
-        (3) level shifting (5V -> 3.3V) circuitry is necessary.
+- Arduino Due
+    - Pros:    
+  
+        - more memory is available (64 kB + 32 kB SRAM),
+        - the same Arduino IDE can be used.
+        - easy to obtain
+    - Cons:
+        - faster than Mega 2560 but slower than Nucleo-F767ZI
+        - software has to be modified. At least, direct port register manipulation should be removed. 
+        - level shifting (5V -> 3.3V) circuitry is necessary.
 
-    Nucleo-F767ZI
-    Pros: 
-        (1) much more memory is available (512 kB SRAM)
-        (2) faster than Arduino Due
-        (3) 5V-tolerant pins are available. No level shifter (5V -> 3.3V) may be necessary.
-    Cons:
-        (1) software has to be re-written.
-        (2) less popularity and less availability (?)
+- Nucleo-F767ZI
+    - Pros: 
+        - much more memory is available (512 kB SRAM)
+        - faster than Arduino Due, much faster than Arduino Mega 2560
+        - 5V-tolerant pins are available. No level shifter (5V -> 3.3V) may be necessary.
+    - Cons:
+        - software has to be re-written.
+        - less popularity and less availability (?) (as comopared with Arduino)
 
-I think that it is a time to gather information about Teensy.
+I think that it is a time to gather information about Teensy, which is a development board with many GPIO pins in a small footprint but still faster than Arduino Mega 2560. Still, Arduino IDE can be used to program Teensy.
+
