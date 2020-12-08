@@ -1,11 +1,11 @@
 # Some notes on the software (sketch)
 
-**1. Interrupt, interrput and again, interrupt**
+## 1. Interrupt, interrput and again, interrupt
 
 My sketch for the HD6120 evaluation board (hereafter referred to as simple "the sketch") is an interrupt-driven program. Depending upon the intended use, HD-6120 has many desicated control signals, unlike the recent processors. Then, I decided to create interrupt handlers for each control signal.
 This strategy needs many interrupt pins but fortunately Arduino Mega 2560 can afford for them.
 
-**2. Memmory usage**
+## 2. Memmory usage
 
 HD-6120 has a 12-bit address space (to be precise, HD-6120 has yet another 3 extended memory address (EMA) bits, so HD-6120 can have 8 banks (*fields* in PDP-8 terminology) of memory (4 kilo words per *field*) but leave it for now). This means that HD-6120 can have up to 4 kilo word of memory.
 
@@ -18,7 +18,7 @@ After consideration, I decided not to make it emulate all memory. Only lower 10 
 
 | address area in hex | address area in octal |
 | :---: | :---: |
-| 0000-03ff | 0000-1777 (user area) |
+| 0000-03ff | 0000-1777 (**user area**) |
 | 0400-07ff | 2000-3777 (echo) |
 | 0800-0bff | 4000-5777 (echo) |
 | 0c00-0fff | 6000-7777 (echo) |
@@ -31,16 +31,16 @@ My idea was the following: one of my goals is to experience the essence of progr
 
 After *Googling*, I found ArduinoSTL library, which includes map class as an associative array and access data stored in a map with iterators. Yes, *MaaM*! (I mean, Memory as a Map object). It works well while processor speed is slow enough; less than 2~3 kHz. Map object (assosiative array) is expensive than I expected. I switched from using assosiative array to simple array in SRAM.
 
-**3. DIO2 library and port manipulation for faster I/O**
+## 3. DIO2 library and port manipulation for faster I/O
 
 To improve I/O performance, I tried 2 options: (1) substituting DigitalWrite/DigitalRead with DigitalWrite2f/DigitalRread2f, as used in *RetroShield* software (for Arduino Mega), (2) substituting DigitalWrite/DigitalRead with direct port manipulation by accessing port registers. Finally, (2) was used for bus-handling and (1) was used for handling other control signals.
 
-    For DigitalWrite2f/DigitalRead2f (provided by Arduino DIO2 library), see also
-    https://www.arduinolibraries.info/libraries/dio2
-    https://www.arduino.cc/reference/en/libraries/dio2/
+- For DigitalWrite2f/DigitalRead2f (provided by Arduino DIO2 library), see also
+https://www.arduinolibraries.info/libraries/dio2
+https://www.arduino.cc/reference/en/libraries/dio2/
 
-    And just for your information, for ArduinoSTL, see also
-    https://www.arduinolibraries.info/libraries/arduino-stl
+- And just for your information, for ArduinoSTL, see also
+https://www.arduinolibraries.info/libraries/arduino-stl
 
 Accessing port registers allow faster maniputation of GPIO pins of Arduino boards but it has serious disadvantages that cannot be overlooked. The sketch became much more hard to understand and to maintain. Even worse, the sketch also bacame less portable (this is the reason why there remains *#define* and conditional directives in the sketch).
 
@@ -69,7 +69,3 @@ Taken together, the table shown below shows ways of accessing GPIO ports and imp
 | 51 k | 120 | 116 | disabled | array | Port register + DIO2 | did not work|
 
 *: Theoretical value from calculation (not actual measured value)
-
-
-
-
