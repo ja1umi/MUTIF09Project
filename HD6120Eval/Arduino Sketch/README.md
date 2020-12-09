@@ -13,7 +13,7 @@ One (1) word consists of 12-bit data. So, one word occupies 2 bytes. 4 kilo x 2 
 
 Memory for HD-6120 is implemented as an array in SRAM in Arduino Mega 2560. It is true that Arduino Mega 2560 has a 8 kB of SRAM but Arduino SRAM is used for other than the array (e.g. global variables). Thus, whole array cannot be allocated. Furthermore, HD-6120 expects that memory is writable. 
  
-After consideration, I decided not to make it emulate all memory. Only lower 10 address bits are decoded; 00000-01777 (in octal). This means that allocated memory size is 1 k words (= 2 k bytes). Any address that has the same lower 10 bits will work. So echoes (images) will appear on 02000-03777, 04000--05777, and 06000-07777 (in octal). With this implementation, accessging memory address from 00000 to 01777 is the same as accessing memory address from 06000 to 07777 (in octal), and vice versa. This is useful because HD-6120 expects that the top and bottom of memory is available. 
+After consideration, I decided not to make it emulate all memory. Only lower 10 address bits are decoded; 00000--01777 (in octal). This means that allocated memory size is 1 k words (= 2 k bytes). Any address that has the same lower 10 bits will work. So echoes (images) will appear on 02000-03777, 04000--05777, and 06000--07777 (in octal). With this implementation, accessging memory address from 00000 to 01777 is the same as accessing memory address from 06000--07777 (in octal), and vice versa. This is useful because HD-6120 expects that the top and bottom of memory is available. 
 
 
 | address area in hex | address area in octal |
@@ -29,7 +29,7 @@ In the early stage of development, associative array-based sparse arrays are use
 
 My idea was the following: one of my goals is to experience the essence of programming of various microprocessors. So, program size would be small. If this is the case, most part of the memory is unused. So, storing pairs of address and data seems to be sufficient. This can signigicantly reduce memory usage. It seemed a good idea at the time.
 
-After *Googling*, I found ArduinoSTL library, which includes map class as an associative array and access data stored in a map with iterators. Yes, *MaaM*! (I mean, Memory as a Map object). It works well while processor speed is slow enough; less than 2~3 kHz. Map object (assosiative array) is expensive than I expected. I switched from using assosiative array to simple array in SRAM.
+After *Googling*, I found ArduinoSTL library, which includes map class as an associative array and access data stored in a map with iterators. Yes, *MaaM*! (I mean, Memory as a Map object). It works well while processor speed is slow enough; less than 1~2 kHz. Map object (assosiative array) is expensive than I expected. I switched from using assosiative array to simple array in SRAM.
 
 ## 3. DIO2 library and port manipulation for faster I/O
 
@@ -63,7 +63,7 @@ Taken together, the table shown below shows ways of accessing GPIO ports and imp
 | 120 k | 1200 | 4.98 | disabled | associative array | DIO2 | did not work |
 | 680 k | 1200 | 8.75 | disabled | array | DIO2 | worked |
 | 200 k | 120 | 29.9 | disabled | array | DIO2 | worked |
-| 190 k | 120 | 31.5 | disabled | array | DIO2 | dit not work |
+| 190 k | 120 | 31.5 | disabled | array | DIO2 | did not work |
 | 190 k | 120 | 31.5 | disabled | array | Port register + DIO2 | work |
 | 56 k | 120 | 106 | disabled | array | Port register + DIO2 | work |
 | 51 k | 120 | 116 | disabled | array | Port register + DIO2 | did not work|
