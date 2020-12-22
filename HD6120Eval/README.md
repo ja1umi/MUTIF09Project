@@ -6,7 +6,7 @@ This is an evaluation board for the HD-6120, which is a CMOS 12-bit microprocess
 
 The entire circuit was built on breadboards at the mement. 
 
-This board and project is inspired by *Retroshield for Arduino Mega* project by Erturk Kocalar. 
+This board and project are inspired by *Retroshield for Arduino Mega* project by Erturk Kocalar. 
 http://www.8bitforce.com/projects/retroshield/
 
 I would like to express my thanks to him for his great contribution to retoromaniacs' world.
