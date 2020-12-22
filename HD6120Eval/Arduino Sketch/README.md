@@ -46,7 +46,7 @@ Accessing port registers allow faster manipulation of GPIO pins of Arduino board
 
 To use port registers, I changed pin assignments for inout and output. 
 
-| GPIO pin configured as an input (HD-6120->Arduino) | GPIO pin condigured as an output (Arduino -> HD-6120) |
+| GPIO pin configured as an input (HD-6120->Arduino) | GPIO pin configured as an output (Arduino -> HD-6120) |
 | :---: | :---: |
 | DP30, DP31, DP32, DP33, DP29, DP28, DP27, DP26, DP25, DP24, DP23, and DP22 | DP34, DP35, DP36, DP37, DP42, DP43, DP44, DP45, DP46, DP47, DP48, and DP49 |
 
